@@ -1,183 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Portfolio</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
-}
-
-body {
-  background: radial-gradient(circle at top, #0f172a, #020617);
-  color: #e2e8f0;
-}
-
-.container {
-  max-width: 1100px;
-  margin: auto;
-  padding: 40px 20px;
-}
-
-/* NAV */
-nav {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 50px;
-}
-
-.logo {
-  font-weight: 700;
-  font-size: 20px;
-  color: #60a5fa;
-}
-
-nav a {
-  color: #cbd5f5;
-  text-decoration: none;
-  margin-left: 20px;
-}
-
-/* HERO */
-.hero {
-  text-align: center;
-  margin-bottom: 60px;
-}
-
-.hero h1 {
-  font-size: 42px;
-  margin-bottom: 10px;
-}
-
-.hero p {
-  color: #94a3b8;
-}
-
-/* CARD STYLE */
-.card {
-  background: rgba(255,255,255,0.05);
-  border-radius: 16px;
-  padding: 20px;
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.08);
-  transition: 0.3s;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  border-color: #6366f1;
-}
-
-/* PROJECT GRID */
-.projects {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-}
-
-/* BUTTON */
-.btn {
-  display: inline-block;
-  margin-top: 10px;
-  padding: 10px 16px;
-  border-radius: 8px;
-  background: linear-gradient(90deg, #6366f1, #8b5cf6);
-  color: white;
-  text-decoration: none;
-  font-size: 14px;
-}
-
-/* SECTION */
-.section {
-  margin-bottom: 60px;
-}
-
-.section h2 {
-  margin-bottom: 20px;
-  font-size: 24px;
-}
-
-/* FOOTER */
-footer {
-  text-align: center;
-  color: #64748b;
-  margin-top: 60px;
-}
-</style>
-
+    <title>Flappy Bird Telegram</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        body { margin: 0; overflow: hidden; background: #70c5ce; font-family: Arial, sans-serif; }
+        canvas { display: block; margin: 0 auto; background: #fff; }
+    </style>
 </head>
-
 <body>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
 
-<div class="container">
+        canvas.width = window.innerWidth > 400 ? 400 : window.innerWidth;
+        canvas.height = window.innerHeight;
 
-<!-- NAV -->
-<nav>
-  <div class="logo">CuriosityEngine</div>
-  <div>
-    <a href="#projects">Projects</a>
-    <a href="#about">About</a>
-  </div>
-</nav>
+        let bird = { x: 50, y: 150, w: 20, h: 20, gravity: 0.6, lift: -10, velocity: 0 };
+        let pipes = [];
+        let frame = 0;
+        let score = 0;
+        let gameOver = false;
 
-<!-- HERO -->
-<div class="hero">
-  <h1>AI Developer Portfolio</h1>
-  <p>Building intelligent systems & real-world AI applications</p>
-</div>
+        function drawBird() {
+            ctx.fillStyle = "yellow";
+            ctx.fillRect(bird.x, bird.y, bird.w, bird.h);
+        }
 
-<!-- PROJECTS -->
-<div class="section" id="projects">
-  <h2>AI Projects</h2>
+        function updateBird() {
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+            if (bird.y + bird.h > canvas.height || bird.y < 0) gameOver = true;
+        }
 
-  <div class="projects">
+        function createPipe() {
+            if (frame % 90 === 0) {
+                let gap = 120;
+                let minPipeHeight = 50;
+                let height = Math.floor(Math.random() * (canvas.height - gap - (minPipeHeight * 2))) + minPipeHeight;
+                pipes.push({ x: canvas.width, top: height, bottom: canvas.height - height - gap });
+            }
+        }
 
-    <div class="card">
-      <h3>AI Paste Tool</h3>
-      <p>Smart pastebin with AI summarization, tagging, and secure sharing.</p>
-      <a href="#" class="btn">View Project</a>
-    </div>
+        function drawPipes() {
+            ctx.fillStyle = "green";
+            pipes.forEach(p => {
+                ctx.fillRect(p.x, 0, 40, p.top);
+                ctx.fillRect(p.x, canvas.height - p.bottom, 40, p.bottom);
+                p.x -= 3;
+            });
+            pipes = pipes.filter(p => p.x > -40);
+        }
 
-    <div class="card">
-      <h3>Personality Reverse Engine</h3>
-      <p>AI system that predicts a person's past patterns from current traits.</p>
-      <a href="#" class="btn">View Project</a>
-    </div>
+        function checkCollision() {
+            pipes.forEach(p => {
+                if (bird.x < p.x + 40 && bird.x + bird.w > p.x &&
+                    (bird.y < p.top || bird.y + bird.h > canvas.height - p.bottom)) {
+                    gameOver = true;
+                }
+            });
+        }
 
-    <div class="card">
-      <h3>Medical Insight AI</h3>
-      <p>Healthcare AI assistant that explains medical data in simple language.</p>
-      <a href="#" class="btn">View Project</a>
-    </div>
+        function gameLoop() {
+            if (gameOver) {
+                ctx.fillStyle = "rgba(0,0,0,0.5)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "white";
+                ctx.fillText("GAME OVER - Tap to Restart", canvas.width/4, canvas.height/2);
+                return;
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBird();
+            updateBird();
+            createPipe();
+            drawPipes();
+            checkCollision();
+            frame++;
+            score++;
+            requestAnimationFrame(gameLoop);
+        }
 
-  </div>
-</div>
+        window.addEventListener("mousedown", () => {
+            if (gameOver) {
+                bird.y = 150; bird.velocity = 0; pipes = []; gameOver = false; score = 0; gameLoop();
+            } else {
+                bird.velocity = bird.lift;
+            }
+        });
 
-<!-- ABOUT -->
-<div class="section" id="about">
-  <h2>About Me</h2>
-  <div class="card">
-    <p>
-      I am an AI-focused developer with a background in IT and healthcare systems.
-      My goal is to build intelligent applications that solve real-world problems
-      using data, automation, and machine learning.
-    </p>
-  </div>
-</div>
-
-<!-- FOOTER -->
-<footer>
-  Made with ❤️ | Prince
-</footer>
-
-</div>
-
+        gameLoop();
+    </script>
 </body>
 </html>
