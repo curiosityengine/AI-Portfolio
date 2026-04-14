@@ -1,1 +1,53 @@
-<h1>Wallverse Coming Soon</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WallVerse</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- YOUR MAIN CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- NAVBAR (same as your portfolio) -->
+<nav class="navbar">
+  <a href="index.html" class="navbar-brand">PastePro</a>
+</nav>
+
+<div class="container">
+
+  <div class="card">
+
+    <h2>🌄 WallVerse</h2>
+    <p class="subtitle">Discover beautiful wallpapers</p>
+
+    <!-- SEARCH -->
+    <input 
+      type="text" 
+      id="search" 
+      class="input"
+      placeholder="Search wallpapers..."
+    >
+
+    <!-- FILTERS -->
+    <div style="margin-top:15px;">
+      <button class="btn" onclick="filterCategory('all')">All</button>
+      <button class="btn" onclick="filterCategory('nature')">Nature</button>
+      <button class="btn" onclick="filterCategory('city')">City</button>
+      <button class="btn" onclick="filterCategory('anime')">Anime</button>
+    </div>
+
+  </div>
+
+  <!-- GALLERY -->
+  <div id="gallery" class="gallery"></div>
+
+</div>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
