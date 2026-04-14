@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Pastebin | Project Details</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #6c63ff;
+            --bg-main: #0f0f1a;
+            --bg-card: #1a1a2e;
+            --border: #2a2a4a;
+            --text-primary: #e8e8f0;
+            --text-secondary: #8888aa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            padding: 50px 20px;
+        }
+
+        .container { max-width: 800px; margin: 0 auto; }
+
+        .back-btn { color: var(--primary); text-decoration: none; font-weight: 500; }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 20px 0 10px;
+            background: linear-gradient(135deg, #ffffff 0%, #aaaacc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle { color: var(--text-secondary); margin-bottom: 40px; }
+
+        .card {
+            background: linear-gradient(145deg, rgba(30, 30, 55, 0.9) 0%, rgba(22, 22, 40, 0.95) 100%);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .tag {
+            background: rgba(108, 99, 255, 0.15);
+            color: var(--primary);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin-right: 10px;
+        }
+
+        .live-link {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">← Back to Portfolio</a>
+        
+        <h1>Cloud Pastebin</h1>
+        <p class="subtitle">Secure, fast, and elegant code sharing.</p>
+
+        <div class="card">
+            <h2>Tech Stack</h2>
+            <div style="margin: 15px 0 30px;">
+                <span class="tag">Node.js</span>
+                <span class="tag">Express</span>
+                <span class="tag">MongoDB</span>
+                <span class="tag">CSS Grid/Flex</span>
+            </div>
+
+            <h2>Project Overview</h2>
+            <p>This application allows users to instantly share code snippets or text. It features a custom-built QR code generator for mobile sharing and a unique "Glassmorphism" UI design.</p>
+            
+            <h2 style="margin-top: 25px;">Key Features</h2>
+            <ul style="margin-left: 20px; color: var(--text-secondary);">
+                <li>Password protection for private pastes.</li>
+                <li>Instant QR code generation for every link.</li>
+                <li>Responsive layout for mobile and desktop.</li>
+                <li>One-click copy to clipboard functionality.</li>
+            </ul>
+
+            <!-- Replace '#' with your actual hosted app link later -->
+            <a href="#" class="live-link">Launch Live Application</a>
+        </div>
+    </div>
+</body>
+</html>
