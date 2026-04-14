@@ -1,201 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flappy Bird</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prince AI | Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --bg: #0a0b10;
+            --card-bg: #161b22;
+            --text: #ffffff;
+            --text-dim: #b1b1b1;
+        }
 
-<style>
-body {
-  margin: 0;
-  overflow: hidden;
-  font-family: sans-serif;
-  background: linear-gradient(to bottom, #4facfe, #00f2fe);
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-canvas { display: block; }
+        body { background-color: var(--bg); color: var(--text); line-height: 1.6; scroll-behavior: smooth; }
 
-#ui {
-  position: absolute;
-  top: 20px;
-  width: 100%;
-  text-align: center;
-  color: white;
-  font-size: 40px;
-  font-weight: bold;
-}
+        /* Navigation */
+        header {
+            background: rgba(10, 11, 16, 0.95);
+            padding: 1rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
 
-#gameOver {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.7);
-  padding: 25px;
-  border-radius: 12px;
-  text-align: center;
-  color: white;
-  display: none;
-}
-</style>
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary); text-decoration: none; }
+
+        nav ul { display: flex; list-style: none; }
+        nav ul li { margin-left: 2rem; }
+        nav ul li a { color: var(--text); text-decoration: none; transition: 0.3s; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        nav ul li a:hover { color: var(--primary); }
+
+        /* Hero Section */
+        #hero {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            background: radial-gradient(circle at center, #1a1c2c 0%, #0a0b10 100%);
+        }
+
+        #hero h1 { font-size: 4rem; margin-bottom: 1rem; }
+        #hero p { font-size: 1.2rem; color: var(--text-dim); max-width: 600px; }
+
+        section { padding: 80px 10%; }
+
+        h2 { font-size: 2.5rem; margin-bottom: 2rem; text-align: center; color: var(--primary); }
+
+        /* Projects Grid */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            border: 1px solid #333;
+        }
+
+        .project-card:hover { transform: translateY(-10px); border-color: var(--primary); }
+
+        .project-img { width: 100%; height: 200px; background: #2d333b; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #444; }
+
+        .project-info { padding: 1.5rem; }
+        .project-info h3 { margin-bottom: 0.5rem; }
+        .project-info p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1rem; }
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: #000;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        /* About Section */
+        #about { background: #0d1117; text-align: center; }
+        .about-content { max-width: 800px; margin: 0 auto; color: var(--text-dim); }
+
+        /* Contact Section */
+        #contact { text-align: center; }
+        .contact-links { display: flex; justify-content: center; gap: 2rem; margin-top: 2rem; }
+        .contact-links a { color: var(--text); font-size: 2rem; transition: 0.3s; }
+        .contact-links a:hover { color: var(--primary); }
+
+        footer { text-align: center; padding: 2rem; border-top: 1px solid #333; font-size: 0.8rem; color: #555; }
+
+        @media (max-width: 768px) {
+            #hero h1 { font-size: 2.5rem; }
+            nav ul { display: none; } /* Simplified for mobile */
+        }
+    </style>
 </head>
-
 <body>
 
-<div id="ui">0</div>
+    <header>
+        <a href="#" class="logo">PRINCE AI</a>
+        <nav>
+            <ul>
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
 
-<div id="gameOver">
-  <h2>Game Over</h2>
-  <p id="finalScore"></p>
-  <button onclick="restart()">Restart</button>
-</div>
+    <section id="hero">
+        <h1>Hi, I'm Prince.</h1>
+        <p>Specializing in AI development, machine learning, and modern web solutions.</p>
+    </section>
 
-<canvas id="gameCanvas"></canvas>
+    <section id="about">
+        <h2>About Me</h2>
+        <div class="about-content">
+            <p>I am a developer passionate about the intersection of Artificial Intelligence and user experience. With expertise in building intelligent systems and responsive web applications, I help turn complex data into actionable insights.</p>
+        </div>
+    </section>
 
-<script>
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+    <section id="projects">
+        <h2>Featured Projects</h2>
+        <div class="project-grid">
+            <!-- Project 1 -->
+            <div class="project-card">
+                <div class="project-img"><i class="fas fa-robot"></i></div>
+                <div class="project-info">
+                    <h3>AI Chat Assistant</h3>
+                    <p>A natural language processor built with OpenAI and Python.</p>
+                    <a href="project-ai-chat.html" class="btn">View Project</a>
+                </div>
+            </div>
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+            <!-- Project 2 -->
+            <div class="project-card">
+                <div class="project-img"><i class="fas fa-chart-line"></i></div>
+                <div class="project-info">
+                    <h3>Data Vision Tool</h3>
+                    <p>Visualizing complex datasets using React and D3.js.</p>
+                    <a href="#" class="btn">View Project</a>
+                </div>
+            </div>
 
-let bird, pipes, score, running;
+            <!-- Project 3 -->
+            <div class="project-card">
+                <div class="project-img"><i class="fas fa-brain"></i></div>
+                <div class="project-info">
+                    <h3>Neural Network Lab</h3>
+                    <p>Experiments in deep learning and image recognition.</p>
+                    <a href="#" class="btn">View Project</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-// physics tuned for Telegram
-const gravity = 0.5;
-const lift = -9;
+    <section id="contact">
+        <h2>Get In Touch</h2>
+        <p>Looking for a collaboration? Send me a message!</p>
+        <div class="contact-links">
+            <a href="mailto:hello@princeai.eu.cc"><i class="fas fa-envelope"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+        </div>
+    </section>
 
-function init() {
-  bird = {
-    x: 80,
-    y: canvas.height / 2,
-    v: 0
-  };
-
-  pipes = [];
-  score = 0;
-  running = true;
-
-  document.getElementById("ui").innerText = "0";
-  document.getElementById("gameOver").style.display = "none";
-}
-
-function createPipe() {
-  const gap = 150;
-  const top = Math.random() * (canvas.height - gap - 100);
-
-  pipes.push({
-    x: canvas.width,
-    w: 60,
-    top: top,
-    bottom: top + gap,
-    passed: false
-  });
-}
-
-// reliable timing (NOT delta-based)
-setInterval(createPipe, 1500);
-
-function drawBird() {
-  ctx.beginPath();
-  ctx.arc(bird.x, bird.y, 14, 0, Math.PI * 2);
-  ctx.fillStyle = "#ffd166";
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.arc(bird.x + 5, bird.y - 5, 4, 0, Math.PI * 2);
-  ctx.fillStyle = "#fff";
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.arc(bird.x + 6, bird.y - 5, 2, 0, Math.PI * 2);
-  ctx.fillStyle = "#000";
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(bird.x + 14, bird.y);
-  ctx.lineTo(bird.x + 22, bird.y - 4);
-  ctx.lineTo(bird.x + 22, bird.y + 4);
-  ctx.fillStyle = "#ff7b00";
-  ctx.fill();
-}
-
-function update() {
-  if (!running) return;
-
-  bird.v += gravity;
-  bird.v = Math.min(bird.v, 10);
-  bird.y += bird.v;
-
-  pipes.forEach(pipe => {
-    pipe.x -= 3;
-
-    // collision
-    if (
-      bird.x + 12 > pipe.x &&
-      bird.x - 12 < pipe.x + pipe.w &&
-      (bird.y - 12 < pipe.top || bird.y + 12 > pipe.bottom)
-    ) {
-      gameOver();
-    }
-
-    // score
-    if (!pipe.passed && pipe.x + pipe.w < bird.x) {
-      pipe.passed = true;
-      score++;
-      document.getElementById("ui").innerText = score;
-    }
-  });
-
-  if (bird.y > canvas.height || bird.y < 0) {
-    gameOver();
-  }
-}
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // tilt
-  ctx.save();
-  ctx.translate(bird.x, bird.y);
-  ctx.rotate(bird.v * 0.05);
-  ctx.translate(-bird.x, -bird.y);
-
-  drawBird();
-
-  ctx.restore();
-
-  ctx.fillStyle = "#2ecc71";
-  pipes.forEach(pipe => {
-    ctx.fillRect(pipe.x, 0, pipe.w, pipe.top);
-    ctx.fillRect(pipe.x, pipe.bottom, pipe.w, canvas.height);
-  });
-}
-
-function loop() {
-  update();
-  draw();
-  requestAnimationFrame(loop);
-}
-
-function gameOver() {
-  running = false;
-  document.getElementById("gameOver").style.display = "block";
-  document.getElementById("finalScore").innerText = "Score: " + score;
-}
-
-function restart() {
-  init();
-}
-
-// controls
-window.addEventListener("click", () => bird.v = lift);
-window.addEventListener("touchstart", () => bird.v = lift);
-
-// start
-init();
-loop();
-</script>
+    <footer>
+        &copy; 2023 Prince AI - princeai.eu.cc
+    </footer>
 
 </body>
 </html>
