@@ -115,3 +115,61 @@ footer {
   padding: 20px;
   color: #aaa;
 }
+
+/* ===== FORM INPUT ===== */
+.input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: white;
+  outline: none;
+  margin-top: 10px;
+}
+
+/* ===== CARD (used in WallVerse) ===== */
+.card {
+  background: rgba(255,255,255,0.05);
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+}
+
+/* ===== SUBTITLE ===== */
+.subtitle {
+  color: #aaa;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+/* ===== GALLERY ===== */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+/* ===== WALL CARD ===== */
+.wall-card {
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.wall-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.wall-card:hover {
+  transform: scale(1.03);
+}
+
+.card {
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.08);
+}
