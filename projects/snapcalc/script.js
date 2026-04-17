@@ -1,8 +1,41 @@
 const inputBox = document.getElementById("inputBox");
 const resultDiv = document.getElementById("result");
 
-// 🔑 Use prompt (safe for GitHub)
+// 🔑 Safe for GitHub
 const API_KEY = prompt("Enter Gemini API Key");
+
+// ----------------------------
+// UNIT NORMALIZATION
+// ----------------------------
+const unitMap = {
+  kg: ["kg", "kilogram", "kilograms"],
+  pound: ["pound", "pounds", "lb", "lbs"],
+  km: ["km", "kilometer", "kilometers"],
+  mile: ["mile", "miles"],
+  acre: ["acre", "acres"],
+  sqft: ["sqft", "square feet", "square foot", "ft2"],
+  kattha: ["kattha", "katha"],
+  usd: ["usd", "dollar", "dollars"]
+};
+
+// Reverse lookup
+function normalizeUnit(word) {
+  for (let key in unitMap) {
+    if (unitMap[key].includes(word)) return key;
+  }
+  return word;
+}
+
+// ----------------------------
+// CONVERSION TABLE
+// ----------------------------
+const conversions = {
+  kg: { pound: 2.20462 },
+  km: { mile: 0.621371 },
+  acre: { sqft: 43560 },
+  sqft: { acre: 1 / 43560 },
+  kattha: { sqft: 1361 }
+};
 
 // ----------------------------
 // EVENT
@@ -19,18 +52,15 @@ inputBox.addEventListener("keypress", function (e) {
 async function processInput(input) {
   resultDiv.textContent = "...";
 
-  // 1️⃣ Local logic first
-  let localResult = handleLocal(input);
-  if (localResult !== null) {
-    resultDiv.textContent = formatResult(localResult);
+  let local = handleLocal(input);
+  if (local !== null) {
+    resultDiv.textContent = formatResult(local);
     return;
   }
 
-  // 2️⃣ AI fallback
   try {
     const parsed = await parseWithAI(input);
     const result = compute(parsed);
-
     resultDiv.textContent = result !== null ? formatResult(result) : "?";
   } catch (err) {
     console.error(err);
@@ -39,83 +69,63 @@ async function processInput(input) {
 }
 
 // ----------------------------
-// LOCAL ENGINE (INDIA + USD FIX)
+// LOCAL ENGINE (SMART)
 // ----------------------------
 function handleLocal(input) {
 
   let n = extractNumber(input);
+  if (!n) return null;
 
   // -------------------------
-  // LAKH CRORE → USD (BILLION)
+  // INR → USD (lakh/crore)
   // -------------------------
-  if ((input.includes("lakh crore")) && (input.includes("dollar") || input.includes("usd"))) {
-    if (n) {
-      let inr = n * 1e12; // lakh crore → INR
-      let usd = inr / 90; // INR → USD
-      return usd / 1e9;   // USD → billion
+  if (input.includes("usd") || input.includes("dollar")) {
+
+    // lakh crore
+    if (input.includes("lakh crore")) {
+      let inr = n * 1e12;
+      return (inr / 83) / 1e9; // billion USD
     }
-  }
 
-  // -------------------------
-  // LAKH CRORE → NUMBER
-  // -------------------------
-  if (input.includes("lakh crore")) {
-    if (n) return n * 1e12;
-  }
-
-  // -------------------------
-  // CRORE → USD
-  // -------------------------
-  if (input.includes("crore") && (input.includes("usd") || input.includes("dollar"))) {
-    if (n) {
+    // crore
+    if (input.includes("crore")) {
       let inr = n * 1e7;
-      return inr / 90;
+      return inr / 83;
     }
-  }
 
-  // -------------------------
-  // LAKH → USD
-  // -------------------------
-  if (input.includes("lakh") && (input.includes("usd") || input.includes("dollar"))) {
-    if (n) {
+    // lakh
+    if (input.includes("lakh")) {
       let inr = n * 1e5;
-      return inr / 90;
+      return inr / 83;
     }
   }
 
   // -------------------------
-  // LAKH → NUMBER
+  // Indian numbers → number
   // -------------------------
-  if (input.includes("lakh")) {
-    if (n) return n * 1e5;
-  }
+  if (input.includes("lakh crore")) return n * 1e12;
+  if (input.includes("crore")) return n * 1e7;
+  if (input.includes("lakh")) return n * 1e5;
 
   // -------------------------
-  // CRORE → NUMBER
+  // GENERIC UNIT CONVERSION
   // -------------------------
-  if (input.includes("crore")) {
-    if (n) return n * 1e7;
+  let words = input.split(" ");
+
+  let fromUnit = null;
+  let toUnit = null;
+
+  for (let w of words) {
+    let u = normalizeUnit(w);
+    if (conversions[u] && !fromUnit) {
+      fromUnit = u;
+    } else if (fromUnit && conversions[fromUnit][u]) {
+      toUnit = u;
+    }
   }
 
-  // -------------------------
-  // KATTHA → SQFT
-  // -------------------------
-  if (input.includes("kattha") && input.includes("sqft")) {
-    if (n) return n * 1361;
-  }
-
-  // -------------------------
-  // KG → POUND
-  // -------------------------
-  if (input.includes("kg") && (input.includes("pound") || input.includes("lb"))) {
-    if (n) return n * 2.20462;
-  }
-
-  // -------------------------
-  // KM → MILE
-  // -------------------------
-  if (input.includes("km") && input.includes("mile")) {
-    if (n) return n * 0.621371;
+  if (fromUnit && toUnit) {
+    return n * conversions[fromUnit][toUnit];
   }
 
   // -------------------------
@@ -127,7 +137,7 @@ function handleLocal(input) {
   }
 
   // -------------------------
-  // SPLIT
+  // SPLIT (Hinglish supported)
   // -------------------------
   if (input.includes("split") || input.includes("baato")) {
     let nums = input.match(/(\d+).*?(\d+)/);
@@ -145,7 +155,7 @@ function handleLocal(input) {
 }
 
 // ----------------------------
-// AI PARSER (FREE GEMINI)
+// AI PARSER (fallback)
 // ----------------------------
 async function parseWithAI(input) {
   const res = await fetch(
@@ -163,13 +173,12 @@ Input: ${input}
 
 Formats:
 
-{"type":"conversion","value":1,"from":"kg","to":"pound"}
+{"type":"conversion","value":1,"from":"acre","to":"sqft"}
 {"type":"percentage","value":10,"total":500}
 {"type":"split","value":1200,"people":3}
 {"type":"math","expression":"5+6*2"}
 
-Support:
-lakh, crore, kattha, usd, dollar
+Support Indian + Hinglish.
 `
           }]
         }]
@@ -194,9 +203,9 @@ function compute(data) {
   switch (data.type) {
 
     case "conversion":
-      if (data.from === "kg") return data.value * 2.20462;
-      if (data.from === "km") return data.value * 0.621371;
-      if (data.from === "kattha") return data.value * 1361;
+      if (conversions[data.from] && conversions[data.from][data.to]) {
+        return data.value * conversions[data.from][data.to];
+      }
       break;
 
     case "percentage":
