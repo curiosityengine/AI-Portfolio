@@ -1,82 +1,82 @@
 const inputBox = document.getElementById("inputBox");
 const resultDiv = document.getElementById("result");
 
-inputBox.addEventListener("keydown", function (e) {
+// Trigger on Enter
+inputBox.addEventListener("keypress", function (e) {
   if (e.key === "Enter") {
-    handleInput(inputBox.value.toLowerCase());
+    handleInput(inputBox.value.toLowerCase().trim());
   }
 });
 
 function handleInput(input) {
+  console.log("Input:", input); // DEBUG
+
   let result = null;
 
   // -------------------------
-  // UNIT CONVERSIONS
+  // KG → POUND
   // -------------------------
-
-  // kg → pound
-  let kgMatch = input.match(/(\d+(\.\d+)?)\s*(kg|kilogram).*(pound|lb)/);
-  if (kgMatch) {
-    result = parseFloat(kgMatch[1]) * 2.20462;
+  if (input.includes("kg") && (input.includes("pound") || input.includes("lb"))) {
+    let num = extractNumber(input);
+    if (num !== null) result = num * 2.20462;
   }
 
-  // km → miles
-  let kmMatch = input.match(/(\d+(\.\d+)?)\s*(km|kilometer).*(mile)/);
-  if (kmMatch) {
-    result = parseFloat(kmMatch[1]) * 0.621371;
+  // -------------------------
+  // KM → MILES
+  // -------------------------
+  else if (input.includes("km") && input.includes("mile")) {
+    let num = extractNumber(input);
+    if (num !== null) result = num * 0.621371;
   }
 
   // -------------------------
   // PERCENTAGE
   // -------------------------
-
-  // "10% of 500"
-  let percentMatch = input.match(/(\d+)%\s*of\s*(\d+)/);
-  if (percentMatch) {
-    result = (parseFloat(percentMatch[1]) / 100) * parseFloat(percentMatch[2]);
+  else if (input.includes("%") && input.includes("of")) {
+    let parts = input.match(/(\d+)\s*%\s*of\s*(\d+)/);
+    if (parts) {
+      result = (parseFloat(parts[1]) / 100) * parseFloat(parts[2]);
+    }
   }
 
   // -------------------------
   // SPLIT
   // -------------------------
-
-  // "split 1200 among 3"
-  let splitMatch = input.match(/split\s*(\d+)\s*(among|between)\s*(\d+)/);
-  if (splitMatch) {
-    result = parseFloat(splitMatch[1]) / parseFloat(splitMatch[3]);
-  }
-
-  // -------------------------
-  // TIME
-  // -------------------------
-
-  // "2 hours 30 min to minutes"
-  let timeMatch = input.match(/(\d+)\s*hour.*(\d+)\s*min.*minute/);
-  if (timeMatch) {
-    result = (parseFloat(timeMatch[1]) * 60) + parseFloat(timeMatch[2]);
+  else if (input.includes("split")) {
+    let parts = input.match(/(\d+).*(\d+)/);
+    if (parts) {
+      result = parseFloat(parts[1]) / parseFloat(parts[2]);
+    }
   }
 
   // -------------------------
   // BASIC MATH
   // -------------------------
-
-  try {
-    if (!result && /^[\d+\-*/().\s]+$/.test(input)) {
+  else if (/^[\d+\-*/().\s]+$/.test(input)) {
+    try {
       result = eval(input);
+    } catch (e) {
+      result = null;
     }
-  } catch (e) {}
+  }
 
   // -------------------------
-  // OUTPUT CONTROL
+  // OUTPUT
   // -------------------------
-
-  if (result !== null) {
+  if (result !== null && !isNaN(result)) {
     resultDiv.textContent = formatResult(result);
   } else {
     resultDiv.textContent = "?";
   }
 }
 
+// Extract first number
+function extractNumber(str) {
+  let match = str.match(/(\d+(\.\d+)?)/);
+  return match ? parseFloat(match[1]) : null;
+}
+
+// Format output
 function formatResult(num) {
   return parseFloat(num.toFixed(2)).toString();
 }
