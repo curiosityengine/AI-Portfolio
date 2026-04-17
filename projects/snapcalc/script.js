@@ -1,8 +1,8 @@
 const inputBox = document.getElementById("inputBox");
 const resultDiv = document.getElementById("result");
 
-// 🔑 ADD YOUR GEMINI API KEY HERE
-const API_KEY = prompt("Enter API Key:");
+// 🔑 Use prompt (safe for GitHub)
+const API_KEY = prompt("Enter Gemini API Key");
 
 // ----------------------------
 // EVENT
@@ -19,14 +19,14 @@ inputBox.addEventListener("keypress", function (e) {
 async function processInput(input) {
   resultDiv.textContent = "...";
 
-  // 1️⃣ Try local logic first (FREE + FAST)
+  // 1️⃣ Local logic first
   let localResult = handleLocal(input);
   if (localResult !== null) {
     resultDiv.textContent = formatResult(localResult);
     return;
   }
 
-  // 2️⃣ Fallback to AI
+  // 2️⃣ AI fallback
   try {
     const parsed = await parseWithAI(input);
     const result = compute(parsed);
@@ -39,53 +39,104 @@ async function processInput(input) {
 }
 
 // ----------------------------
-// LOCAL ENGINE (FAST)
+// LOCAL ENGINE (INDIA + USD FIX)
 // ----------------------------
 function handleLocal(input) {
 
-  // kg → pound
+  let n = extractNumber(input);
+
+  // -------------------------
+  // LAKH CRORE → USD (BILLION)
+  // -------------------------
+  if ((input.includes("lakh crore")) && (input.includes("dollar") || input.includes("usd"))) {
+    if (n) {
+      let inr = n * 1e12; // lakh crore → INR
+      let usd = inr / 83; // INR → USD
+      return usd / 1e9;   // USD → billion
+    }
+  }
+
+  // -------------------------
+  // LAKH CRORE → NUMBER
+  // -------------------------
+  if (input.includes("lakh crore")) {
+    if (n) return n * 1e12;
+  }
+
+  // -------------------------
+  // CRORE → USD
+  // -------------------------
+  if (input.includes("crore") && (input.includes("usd") || input.includes("dollar"))) {
+    if (n) {
+      let inr = n * 1e7;
+      return inr / 83;
+    }
+  }
+
+  // -------------------------
+  // LAKH → USD
+  // -------------------------
+  if (input.includes("lakh") && (input.includes("usd") || input.includes("dollar"))) {
+    if (n) {
+      let inr = n * 1e5;
+      return inr / 83;
+    }
+  }
+
+  // -------------------------
+  // LAKH → NUMBER
+  // -------------------------
+  if (input.includes("lakh")) {
+    if (n) return n * 1e5;
+  }
+
+  // -------------------------
+  // CRORE → NUMBER
+  // -------------------------
+  if (input.includes("crore")) {
+    if (n) return n * 1e7;
+  }
+
+  // -------------------------
+  // KATTHA → SQFT
+  // -------------------------
+  if (input.includes("kattha") && input.includes("sqft")) {
+    if (n) return n * 1361;
+  }
+
+  // -------------------------
+  // KG → POUND
+  // -------------------------
   if (input.includes("kg") && (input.includes("pound") || input.includes("lb"))) {
-    let n = extractNumber(input);
     if (n) return n * 2.20462;
   }
 
-  // km → mile
+  // -------------------------
+  // KM → MILE
+  // -------------------------
   if (input.includes("km") && input.includes("mile")) {
-    let n = extractNumber(input);
     if (n) return n * 0.621371;
   }
 
-  // percentage
+  // -------------------------
+  // PERCENTAGE
+  // -------------------------
   let percent = input.match(/(\d+)%\s*of\s*(\d+)/);
   if (percent) {
     return (percent[1] / 100) * percent[2];
   }
 
-  // split
-  if (input.includes("split")) {
+  // -------------------------
+  // SPLIT
+  // -------------------------
+  if (input.includes("split") || input.includes("baato")) {
     let nums = input.match(/(\d+).*?(\d+)/);
     if (nums) return nums[1] / nums[2];
   }
 
-  // Indian: lakh → number
-  if (input.includes("lakh")) {
-    let n = extractNumber(input);
-    if (n) return n * 100000;
-  }
-
-  // Indian: crore → number
-  if (input.includes("crore")) {
-    let n = extractNumber(input);
-    if (n) return n * 10000000;
-  }
-
-  // Indian: kattha → sqft (default Bihar)
-  if (input.includes("kattha") && input.includes("sqft")) {
-    let n = extractNumber(input);
-    if (n) return n * 1361;
-  }
-
-  // math
+  // -------------------------
+  // BASIC MATH
+  // -------------------------
   if (/^[\d+\-*/().\s]+$/.test(input)) {
     try { return eval(input); } catch {}
   }
@@ -94,7 +145,7 @@ function handleLocal(input) {
 }
 
 // ----------------------------
-// AI PARSER (GEMINI FREE)
+// AI PARSER (FREE GEMINI)
 // ----------------------------
 async function parseWithAI(input) {
   const res = await fetch(
@@ -106,7 +157,7 @@ async function parseWithAI(input) {
         contents: [{
           parts: [{
             text: `
-Convert this into JSON. ONLY JSON.
+Convert into JSON. ONLY JSON.
 
 Input: ${input}
 
@@ -117,8 +168,8 @@ Formats:
 {"type":"split","value":1200,"people":3}
 {"type":"math","expression":"5+6*2"}
 
-Support Indian units:
-kattha, bigha, tola, lakh, crore
+Support:
+lakh, crore, kattha, usd, dollar
 `
           }]
         }]
@@ -129,7 +180,6 @@ kattha, bigha, tola, lakh, crore
   const data = await res.json();
   let text = data.candidates[0].content.parts[0].text;
 
-  // Clean if AI wraps in ```json
   text = text.replace(/```json|```/g, "").trim();
 
   return JSON.parse(text);
@@ -144,18 +194,9 @@ function compute(data) {
   switch (data.type) {
 
     case "conversion":
-      if (data.from === "kg" && data.to.includes("pound")) {
-        return data.value * 2.20462;
-      }
-
-      if (data.from === "km" && data.to.includes("mile")) {
-        return data.value * 0.621371;
-      }
-
-      if (data.from === "kattha" && data.to === "sqft") {
-        return data.value * 1361;
-      }
-
+      if (data.from === "kg") return data.value * 2.20462;
+      if (data.from === "km") return data.value * 0.621371;
+      if (data.from === "kattha") return data.value * 1361;
       break;
 
     case "percentage":
