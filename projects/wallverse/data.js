@@ -11,6 +11,7 @@ async function searchWallpapers(query = "nature", page = 1) {
     id: photo.id,
     url: photo.urls.full,
     thumb: photo.urls.small,
+    download_url: photo.links.download_location,
     category: query,
     tags: photo.tags?.map(t => t.title) || [],
     author: photo.user.name,
