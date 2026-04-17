@@ -17,6 +17,24 @@ document.addEventListener("DOMContentLoaded", () => {
     img.addEventListener("click", () => {
   openModal(item);
 });
+    const favBtn = document.createElement("button");
+favBtn.innerText = "❤️";
+favBtn.style.position = "absolute";
+favBtn.style.top = "10px";
+favBtn.style.right = "10px";
+
+favBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+
+  let saved = JSON.parse(localStorage.getItem("favorites")) || [];
+  saved.push(item);
+  localStorage.setItem("favorites", JSON.stringify(saved));
+
+  alert("Saved!");
+});
+
+div.style.position = "relative";
+div.appendChild(favBtn);
     results.forEach(item => {
       const div = document.createElement("div");
       div.className = "wall-card";
