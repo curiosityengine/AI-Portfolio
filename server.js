@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const OPENAI_KEY = "my openai key";
+const OPENAI_KEY = "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";
 
 app.post("/ai-search", async (req, res) => {
   const { query } = req.body;
