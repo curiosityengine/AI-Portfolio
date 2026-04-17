@@ -21,7 +21,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const div = document.createElement("div");
       div.className = "wall-card";
       div.style.backgroundColor = item.color; // placeholder color while loading
+      const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modalImg");
+const downloadBtn = document.getElementById("downloadBtn");
+const closeModal = document.getElementById("closeModal");
 
+function openModal(item) {
+  modal.classList.remove("hidden");
+  modalImg.src = item.url;
+  downloadBtn.href = item.url;
+}
+
+closeModal.addEventListener("click", () => {
+  modal.classList.add("hidden");
+});
       const img = document.createElement("img");
       img.src = item.thumb;                   // thumb for fast grid load
       img.loading = "lazy";
