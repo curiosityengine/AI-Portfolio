@@ -119,6 +119,6 @@ async function searchWallpapers(query = "nature", page = 1) {
   ]);
 
   // Merge and shuffle so results are mixed, not grouped by source
-  const combined = [...unsplash, ...pixabay, ...pexels];
+  const combined = [...unsplash, ...pixabay, ...pexels, ...wallhave, ...picsum];
   return combined.sort(() => Math.random() - 0.5);
 }
