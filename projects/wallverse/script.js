@@ -16,7 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function openModal(item) {
     modal.classList.remove("hidden");
     modalImg.src = item.url;
-    downloadBtn.href = item.url;
+    downloadBtn.onclick = () => {
+  downloadImage(item.url);
+};
   }
 
   closeModal.addEventListener("click", () => {
@@ -97,6 +99,27 @@ document.addEventListener("DOMContentLoaded", () => {
       resetGallery(query);
     }, 500);
   });
+
+  // ── Download ───────────────────────
+  async function downloadImage(url) {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = "wallverse-image.jpg";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    console.error("Download failed:", error);
+  }
+}
 
   // ── Category ───────────────────────
   window.filterCategory = function(category) {
