@@ -22,17 +22,20 @@ function openModal(item) {
       downloadBtn.innerText = "⏳ Downloading...";
       downloadBtn.disabled = true;
 
-      // Unsplash requires hitting their /download endpoint first (tracks stats)
-      // Then we fetch the actual image as a blob to force a local download
-      const downloadUrl = `https://images.unsplash.com/${item.id}?w=1920&q=80&fm=jpg&fit=crop`;
+      // Step 1: Hit Unsplash download endpoint (required by their guidelines)
+      // This returns a real CDN url that has proper CORS headers
+      const trackRes = await fetch(item.download_url, {
+        headers: { Authorization: `Client-ID ${ACCESS_KEY}` }
+      });
+      const trackData = await trackRes.json();
+      const imageUrl = trackData.url; // actual CDN download link
 
-      const response = await fetch(downloadUrl, { mode: "cors" });
+      // Step 2: Fetch image as blob
+      const imgRes = await fetch(imageUrl);
+      const blob = await imgRes.blob();
 
-      if (!response.ok) throw new Error("Fetch failed");
-
-      const blob = await response.blob();
+      // Step 3: Trigger download
       const blobUrl = URL.createObjectURL(blob);
-
       const a = document.createElement("a");
       a.href = blobUrl;
       a.download = `wallverse-${item.id}.jpg`;
@@ -48,10 +51,8 @@ function openModal(item) {
       }, 2000);
 
     } catch (err) {
-      console.error("Download failed:", err);
-      // Fallback: open in new tab so user can save manually
-      window.open(item.url, "_blank");
-      downloadBtn.innerText = "⬇️ Download";
+      console.error("Download error:", err);
+      downloadBtn.innerText = "❌ Failed";
       downloadBtn.disabled = false;
     }
   };
