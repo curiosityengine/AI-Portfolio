@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QuoteVerse</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="card">
+    <h2>QuoteVerse</h2>
+    <p class="subtitle">Create beautiful quote images</p>
+
+    <textarea id="quoteInput" class="input" placeholder="Type your quote..."></textarea>
+
+    <button class="btn" onclick="generateImage()">Generate</button>
+    <button class="btn" onclick="downloadImage()">Download</button>
+  </div>
+
+  <div class="card" style="text-align:center;">
+    <canvas id="canvas" width="800" height="800"></canvas>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
