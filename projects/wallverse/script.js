@@ -1,3 +1,22 @@
+async function enhanceQuery(userInput) {
+  try {
+    const res = await fetch("http://localhost:3000/ai-search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ query: userInput })
+    });
+
+    const data = await res.json();
+    return data.query;
+
+  } catch (err) {
+    console.error(err);
+    return userInput;
+  }
+}
+
 // script.js — WallVerse app logic
 let currentPage = 1;
 let currentQuery = "nature";
@@ -134,8 +153,9 @@ function openModal(item) {
   searchInput.addEventListener("input", () => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
-      const query = searchInput.value.trim() || "nature";
-      resetGallery(query);
+const userInput = searchInput.value.trim() || "nature";
+const aiQuery = await enhanceQuery(userInput);
+resetGallery(aiQuery);
     }, 500);
   });
 
