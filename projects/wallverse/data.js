@@ -53,11 +53,20 @@ async function fetchPixabay(query, page) {
 }
 
 // ── Wallhaven ────────────────────────────────────────────
-async function fetchWallhaven(query, page) {
+// ── Wallhaven (now with optional NSFW) ─────────────────────────────
+async function fetchWallhaven(query, page, includeNSFW = false) {
   try {
+    let purity = "100"; // default: SFW only
+    if (includeNSFW) {
+      purity = "111";   // SFW + Sketchy + NSFW (most common for full access)
+      // Alternative: "011" for Sketchy + NSFW only, or "001" for NSFW only
+    }
+
     const res = await fetch(
-      `https://wallhaven.cc/api/v1/search?q=${query}&page=${page}&ratios=16x9&apikey=${WALLHAVEN_KEY}`
+      `https://wallhaven.cc/api/v1/search?q=${encodeURIComponent(query)}&page=${page}&ratios=16x9&categories=111&purity=${purity}&apikey=${WALLHAVEN_KEY}`
     );
+
+    if (!res.ok) throw new Error("Wallhaven error");
 
     const data = await res.json();
 
@@ -66,7 +75,8 @@ async function fetchWallhaven(query, page) {
       url: photo.path,
       thumb: photo.thumbs.large,
       color: photo.colors?.[0] || "#111",
-      source: "Wallhaven"
+      source: "Wallhaven",
+      nsfw: photo.purity !== "sfw"   // optional flag for your UI
     }));
   } catch (err) {
     console.error("Wallhaven failed:", err);
@@ -115,17 +125,15 @@ async function fetchPicsum(query, page) {
 }
 
 // ── Main function (called by script.js) ──────────────
-async function searchWallpapers(query = "nature", page = 1) {
-  // All 5 APIs fire at the same time
+async function searchWallpapers(query = "nature", page = 1, includeNSFW = false) {
   const [unsplash, pixabay, pexels, wallhaven, picsum] = await Promise.all([
     fetchUnsplash(query, page),
     fetchPixabay(query, page),
     fetchPexels(query, page),
-    fetchPicsum(query, page),
-    fetchWallhaven(query, page)
+    fetchWallhaven(query, page, includeNSFW),   // ← pass the flag
+    fetchPicsum(query, page)
   ]);
 
-  // Merge and shuffle so results are mixed, not grouped by source
   const combined = [...unsplash, ...pixabay, ...pexels, ...wallhaven, ...picsum];
   return combined.sort(() => Math.random() - 0.5);
 }
