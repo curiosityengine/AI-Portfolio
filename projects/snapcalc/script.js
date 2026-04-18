@@ -11,14 +11,11 @@ inputBox.addEventListener("input", () => {
   const val = inputBox.value.trim();
 
   if (!val) {
-    resultDiv.textContent = "...";
-    resultDiv.classList.remove("error");
+    setResult("_", "idle");
     return;
   }
 
-  resultDiv.textContent = "·";
-  resultDiv.classList.remove("error");
-
+  setResult("·  ·  ·", "loading");
   debounceTimer = setTimeout(() => calculate(val), 600);
 });
 
@@ -34,9 +31,11 @@ async function calculate(input) {
   const key = input.toLowerCase().trim();
 
   if (cache.has(key)) {
-    display(cache.get(key));
+    setResult(cache.get(key), "pop");
     return;
   }
+
+  setResult("·  ·  ·", "loading");
 
   try {
     const res = await fetch(WORKER_URL, {
@@ -48,15 +47,14 @@ async function calculate(input) {
     const data = await res.json();
     const answer = data.answer ?? "?";
     cache.set(key, answer);
-    display(answer);
+    setResult(answer, "pop");
   } catch (err) {
     console.error(err);
-    resultDiv.textContent = "!";
-    resultDiv.classList.add("error");
+    setResult("!", "error");
   }
 }
 
-function display(value) {
-  resultDiv.classList.remove("error");
+function setResult(value, state) {
+  resultDiv.className = state;
   resultDiv.textContent = value;
 }
