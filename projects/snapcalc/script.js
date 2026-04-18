@@ -38,7 +38,7 @@ async function calculate(input) {
   setResult("·  ·  ·", "loading");
 
   try {
-    const res = await fetch(WORKER_URL, {
+    const res = await fetch(`${WORKER_URL}/api/calculate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ input: key }),
