@@ -1,0 +1,16 @@
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Deep navy background matching portfolio theme -->
+  <rect width="32" height="32" rx="8" fill="#0f1226"/>
+
+  <!-- Purple accent top-right dot -->
+  <circle cx="26" cy="6" r="3.5" fill="#6c63ff"/>
+
+  <!-- Bold P monogram in white -->
+  <text
+    x="5" y="25"
+    font-family="Georgia, serif"
+    font-size="24"
+    font-weight="700"
+    fill="#ffffff"
+  >P</text>
+</svg>
