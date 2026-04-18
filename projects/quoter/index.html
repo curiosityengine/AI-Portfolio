@@ -24,15 +24,13 @@
     html, body { min-height: 100vh; background: var(--bg); color: var(--text); font-family: var(--font-ui); }
 
     body::before {
-      content: '';
-      position: fixed; inset: 0;
+      content: ''; position: fixed; inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
       pointer-events: none; z-index: 0; opacity: 0.5;
     }
 
     .page {
-      position: relative; z-index: 1;
-      max-width: 680px; margin: 0 auto;
+      position: relative; z-index: 1; max-width: 680px; margin: 0 auto;
       padding: 3rem 1.5rem 4rem;
       display: flex; flex-direction: column; align-items: center; gap: 2rem;
     }
@@ -61,30 +59,25 @@
       border-radius: 10px; padding: 4px; gap: 4px;
       animation: fadeUp 0.6s 0.1s ease both;
     }
-
     .tab-btn {
-      flex: 1; padding: 0.6rem 1rem;
-      font-family: var(--font-ui); font-size: 0.8rem; letter-spacing: 0.04em;
-      color: var(--muted); background: transparent;
-      border: none; border-radius: 7px; cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      flex: 1; padding: 0.65rem 1rem; font-family: var(--font-ui);
+      font-size: 0.8rem; letter-spacing: 0.03em; color: var(--muted);
+      background: transparent; border: none; border-radius: 7px;
+      cursor: pointer; transition: background 0.2s, color 0.2s;
     }
-
-    .tab-btn.active {
-      background: var(--accent); color: #0e0e0e; font-weight: 500;
-    }
+    .tab-btn.active { background: var(--accent); color: #0e0e0e; font-weight: 500; }
 
     /* ── Tab panels ── */
-    .tab-panel { display: none; width: 100%; animation: fadeUp 0.3s ease both; }
-    .tab-panel.active { display: flex; flex-direction: column; gap: 1rem; }
+    .tab-panel { display: none; width: 100%; }
+    .tab-panel.active { display: flex; flex-direction: column; gap: 1rem; animation: fadeUp 0.3s ease both; }
 
-    /* ── Textarea (shared) ── */
+    /* ── Shared textarea style ── */
     textarea {
-      width: 100%; min-height: 120px; padding: 1.1rem 1.25rem;
-      font-family: 'Playfair Display', serif; font-size: 1.1rem;
+      width: 100%; padding: 1.1rem 1.25rem;
+      font-family: 'Playfair Display', serif; font-size: 1.05rem;
       font-style: italic; color: var(--text); background: var(--surface);
       border: 1px solid var(--border); border-radius: 12px;
-      resize: none; outline: none; line-height: 1.6;
+      resize: none; outline: none; line-height: 1.65;
       transition: border-color 0.2s, box-shadow 0.2s;
       caret-color: var(--accent);
     }
@@ -94,77 +87,43 @@
       box-shadow: 0 0 0 3px rgba(201,169,110,0.06);
     }
 
-    .input-footer {
-      display: flex; justify-content: space-between; align-items: center;
+    /* ── Row helpers ── */
+    .row {
+      display: flex; justify-content: space-between;
+      align-items: center; gap: 0.75rem;
     }
-    #charCount { font-size: 0.7rem; color: var(--muted); }
-
-    /* ── Category grid ── */
-    .category-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.5rem;
-    }
-
-    .cat-btn {
-      padding: 0.55rem 0.5rem; font-family: var(--font-ui);
-      font-size: 0.75rem; letter-spacing: 0.03em;
-      color: var(--muted); background: var(--surface);
-      border: 1px solid var(--border); border-radius: 8px;
-      cursor: pointer; transition: all 0.15s; text-align: center;
-    }
-    .cat-btn:hover { border-color: rgba(201,169,110,0.4); color: var(--text); }
-    .cat-btn.selected {
-      border-color: var(--accent); color: var(--accent);
-      background: var(--accent-dim);
-    }
-
-    /* ── Language toggle ── */
-    .lang-row {
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .lang-label { font-size: 0.72rem; color: var(--muted); }
-    .lang-toggle {
-      display: flex; background: var(--surface);
-      border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
-    }
-    .lang-opt {
-      padding: 0.35rem 0.9rem; font-size: 0.75rem; font-family: var(--font-ui);
-      color: var(--muted); background: transparent; border: none;
-      cursor: pointer; transition: all 0.15s;
-    }
-    .lang-opt.selected { background: var(--accent); color: #0e0e0e; font-weight: 500; }
+    .hint-text { font-size: 0.7rem; color: var(--muted); }
 
     /* ── Buttons ── */
     .primary-btn {
-      padding: 0.75rem 2rem; background: var(--accent); color: #0e0e0e;
-      font-family: var(--font-ui); font-size: 0.85rem; letter-spacing: 0.05em;
-      border: none; border-radius: 8px; cursor: pointer;
+      padding: 0.75rem 1.75rem; background: var(--accent); color: #0e0e0e;
+      font-family: var(--font-ui); font-size: 0.85rem; letter-spacing: 0.04em;
+      border: none; border-radius: 8px; cursor: pointer; white-space: nowrap;
       transition: opacity 0.2s, transform 0.15s;
     }
     .primary-btn:hover { opacity: 0.88; transform: translateY(-1px); }
     .primary-btn:active { transform: translateY(0); }
     .primary-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-    /* Generated quote preview */
-    .quote-preview {
-      display: none; padding: 1rem 1.25rem;
+    /* ── Generated quote box ── */
+    .quote-box {
+      display: none; padding: 1.1rem 1.25rem;
       background: var(--accent-dim); border: 1px solid rgba(201,169,110,0.25);
-      border-radius: 10px; font-family: 'Playfair Display', serif;
-      font-style: italic; font-size: 1rem; line-height: 1.6; color: var(--text);
+      border-radius: 12px; font-family: 'Playfair Display', serif;
+      font-style: italic; font-size: 1.05rem; line-height: 1.65;
+      color: var(--text); outline: none; min-height: 80px;
+      transition: border-color 0.2s;
     }
-    .quote-preview.visible { display: block; }
-    .preview-actions {
-      display: none; gap: 0.5rem; align-items: center; flex-wrap: wrap;
-    }
-    .preview-actions.visible { display: flex; }
-    .preview-hint { font-size: 0.7rem; color: var(--muted); flex: 1; }
+    .quote-box:focus { border-color: rgba(201,169,110,0.5); }
+    .quote-box.visible { display: block; }
 
-    /* Action row */
+    /* ── Action buttons ── */
     .action-row { display: none; width: 100%; gap: 0.75rem; }
     .action-row.visible { display: flex; }
 
     .action-btn {
       flex: 1; padding: 0.85rem 0.5rem; background: transparent;
-      color: var(--accent); font-family: var(--font-ui); font-size: 0.78rem;
+      color: var(--accent); font-family: var(--font-ui); font-size: 0.75rem;
       letter-spacing: 0.08em; text-transform: uppercase;
       border: 1px solid rgba(201,169,110,0.3); border-radius: 8px;
       cursor: pointer; transition: background 0.2s, border-color 0.2s;
@@ -172,15 +131,14 @@
     .action-btn:hover { background: var(--accent-dim); border-color: rgba(201,169,110,0.5); }
     .action-btn.primary { background: var(--accent); color: #0e0e0e; border-color: var(--accent); }
     .action-btn.primary:hover { opacity: 0.88; }
-    .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
+    /* ── Status + canvas ── */
     #status { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.05em; min-height: 1rem; text-align: center; }
-
-    .canvas-wrap { width: 100%; animation: fadeUp 0.5s ease both; }
+    .canvas-wrap { width: 100%; }
     #quoteCanvas { width: 100%; height: auto; border-radius: 16px; display: block; box-shadow: 0 24px 80px rgba(0,0,0,0.6); }
 
-    @keyframes fadeDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeUp   { from { opacity: 0; transform: translateY(10px);  } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(10px);  } to { opacity:1; transform:translateY(0); } }
   </style>
 </head>
 <body>
@@ -189,63 +147,42 @@
   <header>
     <div class="badge">AI Quote Generator</div>
     <h1>Quot<em>er</em></h1>
-    <p class="tagline">type any quote · any language · get a shareable image</p>
+    <p class="tagline">type a quote or an idea · get a beautiful shareable image</p>
   </header>
 
   <!-- Tabs -->
   <div class="tabs">
     <button class="tab-btn active" data-tab="write">✏️ Write your own</button>
-    <button class="tab-btn" data-tab="generate">✨ Generate for me</button>
+    <button class="tab-btn" data-tab="idea">✨ Give me an idea</button>
   </div>
 
   <!-- Tab 1: Write your own -->
   <div class="tab-panel active" id="tab-write">
-    <textarea id="quoteInputWrite" placeholder="Type your quote here... Good morning, Happy Diwali, Stay hungry stay foolish..." maxlength="280" autofocus></textarea>
-    <div class="input-footer">
-      <span id="charCount">0 / 280</span>
-      <button class="primary-btn" id="generateBtnWrite">Generate →</button>
+    <textarea id="ownQuote" rows="4"
+      placeholder="Type your quote here...&#10;&#10;e.g. Good morning · Happy Diwali · Stay hungry, stay foolish"
+      maxlength="280"></textarea>
+    <div class="row">
+      <span class="hint-text" id="charCount">0 / 280</span>
+      <button class="primary-btn" id="generateOwn">Generate →</button>
     </div>
   </div>
 
-  <!-- Tab 2: Generate for me -->
-  <div class="tab-panel" id="tab-generate">
-
-    <!-- Category grid -->
-    <div class="category-grid">
-      <button class="cat-btn" data-cat="success">🏆 Success</button>
-      <button class="cat-btn" data-cat="motivation">🔥 Motivation</button>
-      <button class="cat-btn" data-cat="failure">💪 Failure</button>
-      <button class="cat-btn" data-cat="celebration">🎉 Celebration</button>
-      <button class="cat-btn" data-cat="happy">😊 Happy</button>
-      <button class="cat-btn" data-cat="sad">🌧 Sad</button>
-      <button class="cat-btn" data-cat="shayri">🌹 Shayri</button>
-      <button class="cat-btn" data-cat="congratulations">🎊 Congrats</button>
-      <button class="cat-btn" data-cat="health">🌿 Health</button>
-      <button class="cat-btn" data-cat="love">❤️ Love</button>
-      <button class="cat-btn" data-cat="friendship">🤝 Friendship</button>
-      <button class="cat-btn" data-cat="life">🌍 Life</button>
+  <!-- Tab 2: Give me an idea -->
+  <div class="tab-panel" id="tab-idea">
+    <textarea id="ideaInput" rows="3"
+      placeholder="Describe what you need...&#10;&#10;e.g. sad shayri about missing someone · congratulate my friend on her new job · something about rainy days"></textarea>
+    <div class="row">
+      <span class="hint-text">Any language · Any mood · Any occasion</span>
+      <button class="primary-btn" id="getQuoteBtn">Write Quote →</button>
     </div>
 
-    <!-- Language + Get Quote -->
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
-      <div class="lang-row">
-        <span class="lang-label">Language:</span>
-        <div class="lang-toggle">
-          <button class="lang-opt selected" data-lang="English">English</button>
-          <button class="lang-opt" data-lang="Hindi">Hindi</button>
-        </div>
-      </div>
-      <button class="primary-btn" id="getQuoteBtn" disabled>Get Quote →</button>
+    <!-- AI-written quote (editable) -->
+    <div class="quote-box" id="quoteBox" contenteditable="true" spellcheck="false"></div>
+
+    <div class="row" id="generateIdeaRow" style="display:none; justify-content:flex-end;">
+      <span class="hint-text">Edit the quote if you'd like, then generate.</span>
+      <button class="primary-btn" id="generateIdea">Generate Image →</button>
     </div>
-
-    <!-- Generated quote preview + edit -->
-    <div class="quote-preview" id="quotePreview"></div>
-
-    <div class="preview-actions" id="previewActions">
-      <span class="preview-hint">You can edit the quote above before generating.</span>
-      <button class="primary-btn" id="generateBtnGenerate">Generate Image →</button>
-    </div>
-
   </div>
 
   <div id="status"></div>
@@ -264,122 +201,94 @@
 <script>
   const WORKER_URL = "https://snapcalc.princemishra11.workers.dev";
 
-  // ── State ──
-  let selectedCategory = null;
-  let selectedLanguage = "English";
-  let generatedQuote   = "";
+  const statusEl       = document.getElementById("status");
+  const canvasWrap     = document.getElementById("canvasWrap");
+  const canvas         = document.getElementById("quoteCanvas");
+  const ctx            = canvas.getContext("2d");
+  const actionRow      = document.getElementById("actionRow");
 
-  // ── Elements ──
-  const statusEl         = document.getElementById("status");
-  const canvasWrap       = document.getElementById("canvasWrap");
-  const canvas           = document.getElementById("quoteCanvas");
-  const ctx              = canvas.getContext("2d");
-  const actionRow        = document.getElementById("actionRow");
-  const quotePreview     = document.getElementById("quotePreview");
-  const previewActions   = document.getElementById("previewActions");
-
-  // ── Tab switching ──
+  // ── Tab switching ──────────────────────────
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
       document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
       btn.classList.add("active");
       document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
-      // Reset canvas on tab switch
       canvasWrap.style.display = "none";
       actionRow.classList.remove("visible");
       setStatus("");
     });
   });
 
-  // ── Tab 1: Write your own ──
-  const quoteInputWrite  = document.getElementById("quoteInputWrite");
-  const charCount        = document.getElementById("charCount");
-  const generateBtnWrite = document.getElementById("generateBtnWrite");
+  // ── Tab 1: Write your own ──────────────────
+  const ownQuote    = document.getElementById("ownQuote");
+  const charCount   = document.getElementById("charCount");
+  const generateOwn = document.getElementById("generateOwn");
 
-  quoteInputWrite.addEventListener("input", () => {
-    charCount.textContent = `${quoteInputWrite.value.length} / 280`;
+  ownQuote.addEventListener("input", () => {
+    charCount.textContent = `${ownQuote.value.length} / 280`;
   });
 
-  generateBtnWrite.addEventListener("click", () => {
-    const quote = quoteInputWrite.value.trim();
-    if (!quote) return;
-    makeImage(quote);
+  generateOwn.addEventListener("click", () => {
+    const q = ownQuote.value.trim();
+    if (!q) return;
+    makeImage(q, generateOwn);
   });
 
-  // ── Tab 2: Generate for me ──
-  const getQuoteBtn         = document.getElementById("getQuoteBtn");
-  const generateBtnGenerate = document.getElementById("generateBtnGenerate");
+  // ── Tab 2: Idea → Quote → Image ───────────
+  const ideaInput       = document.getElementById("ideaInput");
+  const getQuoteBtn     = document.getElementById("getQuoteBtn");
+  const quoteBox        = document.getElementById("quoteBox");
+  const generateIdeaRow = document.getElementById("generateIdeaRow");
+  const generateIdea    = document.getElementById("generateIdea");
 
-  // Category selection
-  document.querySelectorAll(".cat-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-      selectedCategory = btn.dataset.cat;
-      getQuoteBtn.disabled = false;
-    });
-  });
-
-  // Language selection
-  document.querySelectorAll(".lang-opt").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".lang-opt").forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-      selectedLanguage = btn.dataset.lang;
-    });
-  });
-
-  // Get Quote button
   getQuoteBtn.addEventListener("click", async () => {
-    if (!selectedCategory) return;
+    const idea = ideaInput.value.trim();
+    if (!idea) return;
+
     getQuoteBtn.disabled = true;
     getQuoteBtn.textContent = "Writing...";
-    quotePreview.classList.remove("visible");
-    previewActions.classList.remove("visible");
-    setStatus("Generating a quote for you...");
+    quoteBox.classList.remove("visible");
+    generateIdeaRow.style.display = "none";
+    canvasWrap.style.display = "none";
+    actionRow.classList.remove("visible");
+    setStatus("Writing your quote...");
 
     try {
       const res = await fetch(`${WORKER_URL}/api/generate-quote`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category: selectedCategory, language: selectedLanguage }),
+        body: JSON.stringify({ idea }),
       });
       const data = await res.json();
-      generatedQuote = data.quote || "";
 
-      if (generatedQuote) {
-        quotePreview.textContent = generatedQuote;
-        quotePreview.contentEditable = "true";
-        quotePreview.classList.add("visible");
-        previewActions.classList.add("visible");
+      if (data.quote) {
+        quoteBox.textContent = data.quote;
+        quoteBox.classList.add("visible");
+        generateIdeaRow.style.display = "flex";
         setStatus("");
       } else {
-        setStatus("Couldn't generate a quote. Try again.");
+        setStatus("Couldn't write a quote. Try rephrasing your idea.");
       }
     } catch {
       setStatus("Something went wrong. Try again.");
     } finally {
       getQuoteBtn.disabled = false;
-      getQuoteBtn.textContent = "Get Quote →";
+      getQuoteBtn.textContent = "Write Quote →";
     }
   });
 
-  // Generate Image from generated quote (editable)
-  generateBtnGenerate.addEventListener("click", () => {
-    const quote = quotePreview.textContent.trim();
-    if (!quote) return;
-    makeImage(quote);
+  generateIdea.addEventListener("click", () => {
+    const q = quoteBox.textContent.trim();
+    if (!q) return;
+    makeImage(q, generateIdea);
   });
 
-  // ── Core: make image ──
-  async function makeImage(quote) {
-    // Disable all generate buttons
-    generateBtnWrite.disabled = true;
-    generateBtnGenerate.disabled = true;
-    getQuoteBtn.disabled = true;
-    actionRow.classList.remove("visible");
+  // ── Core: generate image ───────────────────
+  async function makeImage(quote, triggerBtn) {
+    triggerBtn.disabled = true;
     canvasWrap.style.display = "none";
+    actionRow.classList.remove("visible");
     setStatus("Reading your quote...");
 
     try {
@@ -397,18 +306,16 @@
     } catch {
       setStatus("Something went wrong. Try again.");
     } finally {
-      generateBtnWrite.disabled = false;
-      generateBtnGenerate.disabled = false;
-      getQuoteBtn.disabled = !selectedCategory;
+      triggerBtn.disabled = false;
     }
   }
 
-  // ── Action buttons ──
+  // ── Action buttons ─────────────────────────
   document.getElementById("downloadBtn").addEventListener("click", () => {
-    const link = document.createElement("a");
-    link.download = "quoter.png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
+    const a = document.createElement("a");
+    a.download = "quoter.png";
+    a.href = canvas.toDataURL("image/png");
+    a.click();
   });
 
   document.getElementById("copyBtn").addEventListener("click", async () => {
@@ -442,7 +349,7 @@
 
   function setStatus(msg) { statusEl.textContent = msg; }
 
-  // ── Canvas drawing ──
+  // ── Canvas drawing ─────────────────────────
   async function drawQuoteImage(quote, data) {
     const SIZE = 1080;
     ctx.clearRect(0, 0, SIZE, SIZE);
@@ -458,8 +365,8 @@
     ctx.fillStyle = `rgba(0,0,0,${data.overlayOpacity ?? 0.4})`;
     ctx.fillRect(0, 0, SIZE, SIZE);
 
-    const accent = data.textColor === "#000000" ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.12)";
-    ctx.fillStyle = accent;
+    const lineColor = data.textColor === "#000000" ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.12)";
+    ctx.fillStyle = lineColor;
     ctx.fillRect(80, 90, SIZE - 160, 1.5);
     ctx.fillRect(80, SIZE - 90, SIZE - 160, 1.5);
 
