@@ -525,7 +525,7 @@ canvas {
     }
 
     #result {
-      font-size: clamp(3.5rem, 14vw, 7rem);
+      font-size: clamp(1.5rem, 6vw, 5rem);
       font-weight: 800;
       letter-spacing: -0.04em;
       line-height: 1;
