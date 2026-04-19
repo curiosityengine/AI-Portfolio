@@ -414,3 +414,56 @@ select option { background: var(--card); }
   transition: color 0.2s;
 }
 .sn-counter-dot { opacity: 0.4; }
+
+/* ── AI EXPLAIN ── */
+.sn-explain-wrap {
+  margin-top: 1rem;
+}
+
+.sn-explain-btn {
+  font-size: 0.8rem; color: var(--accent);
+  padding: 0.5rem 1.1rem;
+  border: 1px solid rgba(0,229,160,0.25);
+  border-radius: 8px; background: var(--accent-dim);
+  cursor: pointer; font-family: var(--font-body);
+  transition: all 0.2s;
+}
+.sn-explain-btn:hover {
+  background: var(--accent-glow);
+  border-color: rgba(0,229,160,0.5);
+}
+.sn-explain-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.sn-explain-box {
+  margin-top: 0.75rem;
+  background: var(--card); border: 1px solid rgba(0,229,160,0.15);
+  border-radius: 12px; overflow: hidden;
+  animation: fadeInUp 0.3s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.sn-explain-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.65rem 1rem; border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.sn-explain-label {
+  font-size: 0.68rem; color: var(--accent);
+  text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600;
+}
+.sn-explain-close {
+  font-size: 0.72rem; color: var(--muted);
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-body); transition: color 0.15s;
+}
+.sn-explain-close:hover { color: var(--text); }
+
+.sn-explain-text {
+  padding: 1rem 1.1rem;
+  font-size: 0.88rem; color: var(--muted-light);
+  line-height: 1.75; margin: 0;
+}
