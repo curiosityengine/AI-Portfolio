@@ -102,12 +102,12 @@ a { text-decoration: none; color: inherit; }
 }
 .tv-usecase::-webkit-scrollbar { display: none; }
 .tv-usecase-label {
-  font-size: 0.72rem; color: var(--muted);
+  font-size: 0.85rem; color: var(--muted);
   white-space: nowrap; margin-right: 0.25rem; flex-shrink: 0;
 }
 .tv-usecase-btn {
   flex-shrink: 0; padding: 0.4rem 0.9rem;
-  font-family: var(--font-body); font-size: 0.78rem;
+  font-family: var(--font-body); font-size: 0.88rem;
   color: var(--muted-light); background: transparent;
   border: 1px solid var(--border); border-radius: 999px;
   cursor: pointer; transition: all 0.15s; white-space: nowrap;
@@ -125,7 +125,7 @@ a { text-decoration: none; color: inherit; }
 }
 .tv-recommend-toggle {
   display: inline-flex; align-items: center; gap: 0.5rem;
-  font-size: 0.78rem; color: var(--muted-light);
+  font-size: 0.88rem; color: var(--muted-light);
   cursor: pointer; transition: color 0.2s;
   background: none; border: none; font-family: var(--font-body);
   padding: 0; margin-bottom: 0.75rem;
