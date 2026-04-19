@@ -520,24 +520,15 @@ function saveToHistory(item) {
 }
 
 function renderHistory() {
-  const history = getHistory();
-  const section = document.getElementById("downloadHistory");
-  const gallery = document.getElementById("historyGallery");
-
-  if (!history.length) {
-    section.style.display = "none";
-    return;
-  }
-
-  section.style.display = "block";
-  gallery.innerHTML = "";
-  history.forEach(item => gallery.appendChild(makeCard(item)));
+  // History is shown inside the Favourites panel — nothing to do here
 }
 
 function clearHistory() {
   localStorage.removeItem("wv_history");
+  // Re-render the favourites panel
   showingFavs = false;
   gallery.classList.add("wv-masonry");
+  gallery.style.cssText = "";
   toggleFavView();
 }
 </script>
