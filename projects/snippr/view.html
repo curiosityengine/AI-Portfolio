@@ -286,6 +286,51 @@
   }
 
   loadPaste();
+
+  // ── AI Explain ────────────────────────────
+const WORKER_URL = "https://snapcalc.princemishra11.workers.dev";
+
+async function explainCode() {
+  if (!pasteData?.content) return;
+
+  const btn = document.getElementById("explainBtn");
+  btn.disabled = true;
+  btn.textContent = "✦ Thinking...";
+
+  try {
+    const res  = await fetch(`${WORKER_URL}/api/explain`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code:     pasteData.content,
+        language: pasteData.language || "code"
+      }),
+    });
+    const data = await res.json();
+
+    if (data.explanation) {
+      document.getElementById("explainText").textContent = data.explanation;
+      document.getElementById("explainBox").style.display = "block";
+      document.getElementById("explainBtn").style.display = "none";
+    } else {
+      btn.textContent = "✦ Try again";
+      btn.disabled = false;
+      setTimeout(() => btn.textContent = "✦ Explain this code", 2000);
+    }
+  } catch {
+    btn.textContent = "✦ Try again";
+    btn.disabled = false;
+    setTimeout(() => btn.textContent = "✦ Explain this code", 2000);
+  }
+}
+
+function closeExplain() {
+  document.getElementById("explainBox").style.display = "none";
+  const btn = document.getElementById("explainBtn");
+  btn.style.display = "inline-block";
+  btn.textContent = "✦ Explain this code";
+  btn.disabled = false;
+}
 </script>
 </body>
 </html>
