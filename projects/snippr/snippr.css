@@ -390,3 +390,18 @@ select option { background: var(--card); }
   .sn-view-header { flex-direction: column; }
   .sn-row { grid-template-columns: 1fr; }
 }
+
+/* ── FORMAT BUTTON ── */
+.sn-format-btn {
+  font-size: 0.72rem; color: var(--accent);
+  padding: 0.3rem 0.75rem;
+  border: 1px solid rgba(0,229,160,0.25);
+  border-radius: 6px; background: var(--accent-dim);
+  cursor: pointer; font-family: var(--font-body);
+  transition: all 0.15s; white-space: nowrap;
+}
+.sn-format-btn:hover {
+  background: var(--accent-glow);
+  border-color: rgba(0,229,160,0.5);
+}
+.sn-format-btn:disabled { opacity: 0.4; cursor: not-allowed; }
