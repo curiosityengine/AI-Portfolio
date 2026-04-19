@@ -245,38 +245,33 @@ select option { background: var(--card); }
 
 /* ── SHARE CARD ── */
 .sn-share-card {
-  flex: 1; background: var(--card);
-  border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1.1rem;
+  margin-bottom: 1.25rem;
 }
-.sn-share-url-wrap { display: flex; gap: 0.6rem; margin-bottom: 0.85rem; }
-.sn-share-url {
-  flex: 1; background: var(--surface); border: 1px solid var(--border);
-  border-radius: 8px; padding: 0.6rem 0.9rem;
-  color: var(--muted-light); font-size: 0.8rem;
-  font-family: var(--font-mono); outline: none;
+.sn-share-url-wrap {
+  display: flex; gap: 0.6rem; margin-bottom: 1rem;
+  padding-bottom: 1rem; border-bottom: 1px solid var(--border);
 }
-.sn-copy-btn {
-  padding: 0.6rem 1rem; background: var(--accent); color: #080808;
-  font-family: var(--font-body); font-size: 0.78rem; font-weight: 600;
-  border: none; border-radius: 8px; cursor: pointer; transition: opacity 0.15s;
-  white-space: nowrap;
+.sn-share-body {
+  display: flex; gap: 1.5rem; align-items: center;
 }
-.sn-copy-btn:hover { opacity: 0.85; }
+.sn-share-left { flex: 1; }
+.sn-share-label {
+  font-size: 0.68rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+}
+.sn-share-right {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 0.6rem; flex-shrink: 0;
+}
+.sn-share-btns {
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
 
-.sn-share-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.sn-share-btn {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  padding: 0.4rem 0.8rem; font-size: 0.75rem;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 7px; color: var(--muted-light);
-  transition: all 0.15s; font-family: var(--font-body);
-}
-.sn-share-btn svg { width: 13px; height: 13px; }
-.sn-share-btn:hover { border-color: var(--border-hover); }
-.sn-wa:hover { color: #25D366; border-color: #25D366; }
-.sn-tg:hover { color: #0088cc; border-color: #0088cc; }
-.sn-tw:hover { color: #1DA1F2; border-color: #1DA1F2; }
-.sn-em:hover { color: var(--accent); border-color: var(--accent); }
+/* Remove old qr-center */
+.sn-qr-center { display: none; }
 
 /* ── QR CARD ── */
 .sn-qr-card {
