@@ -42,7 +42,7 @@
   <button class="tv-usecase-btn" data-usecase="organise">Stay organised</button>
 </div>
 
-<!-- AI RECOMMENDATION (collapsible) -->
+<!-- AI RECOMMENDATION -->
 <div class="tv-recommend-wrap">
   <button class="tv-recommend-toggle" id="recommendToggle" onclick="toggleRecommend()">
     <i class="fas fa-wand-magic-sparkles"></i> Not sure? Let AI pick for you
@@ -94,6 +94,30 @@
 <!-- FOOTER -->
 <footer class="tv-footer">© 2026 ToolVerse · Built by Prince</footer>
 
+<!-- COMPARE BAR -->
+<div class="tv-compare-bar" id="compareBar">
+  <span class="tv-compare-bar-label">Compare</span>
+  <div class="tv-compare-slots" id="compareSlots"></div>
+  <button class="tv-compare-go-btn" id="compareGoBtn" onclick="openCompare()" disabled>Compare →</button>
+  <button class="tv-compare-clear" onclick="clearCompare()">Clear</button>
+</div>
+
+<!-- COMPARE OVERLAY -->
+<div class="tv-compare-overlay" id="compareOverlay" onclick="closeCompare()"></div>
+
+<!-- COMPARE PANEL -->
+<div class="tv-compare-panel" id="comparePanel">
+  <div class="tv-compare-panel-inner">
+    <div class="tv-compare-panel-header">
+      <span class="tv-compare-panel-title">Comparing tools</span>
+      <button class="tv-compare-close" onclick="closeCompare()">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+    <div id="compareTable"></div>
+  </div>
+</div>
+
 <script src="tools.js"></script>
 <script>
   const WORKER_URL = "https://snapcalc.princemishra11.workers.dev";
@@ -101,6 +125,7 @@
   let activeCategory = "all";
   let activeUsecase  = null;
   let searchQuery    = "";
+  let compareList    = [];
 
   // ── Init ──────────────────────────────────
   function init() {
@@ -201,19 +226,18 @@
           </div>
         </div>
         <div class="tv-card-desc">${t.description}</div>
-        ```js
-<div class="tv-card-bottom">
-  <div class="tv-card-meta">
-    <div class="tv-card-rating"><i class="fas fa-star"></i> ${t.rating}</div>
-    <span class="tv-pricing ${pricingClass(t.pricing)}">${t.pricing}</span>
-  </div>
-  <div class="tv-card-actions">
-    <button class="tv-compare-btn" id="cmp-${t.id}"
-      onclick="event.stopPropagation(); toggleCompare(${t.id})">+ Compare</button>
-    <span class="tv-visit-btn">Visit →</span>
-  </div>
-</div>
-```
+        <div class="tv-card-bottom">
+          <div class="tv-card-meta">
+            <div class="tv-card-rating"><i class="fas fa-star"></i> ${t.rating}</div>
+            <span class="tv-pricing ${pricingClass(t.pricing)}">${t.pricing}</span>
+          </div>
+          <div class="tv-card-actions">
+            <button class="tv-compare-btn" id="cmp-${t.id}"
+              onclick="event.stopPropagation(); toggleCompare(${t.id})">+ Compare</button>
+            <span class="tv-visit-btn">Visit →</span>
+          </div>
+        </div>
+      </div>
     `).join("");
   }
 
@@ -228,7 +252,6 @@
     const tool = TOOLS.find(t => t.id === Number(id));
     if (!tool) return;
 
-    // Update URL so the modal is shareable
     history.pushState({}, "", `?tool=${id}`);
 
     const related = TOOLS
@@ -283,7 +306,9 @@
     history.pushState({}, "", location.pathname);
   }
 
-  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") { closeModal(); closeCompare(); }
+  });
 
   // ── Share ─────────────────────────────────
   function shareTool(id) {
@@ -357,201 +382,134 @@
     if (e.key === "Enter") getRecommendations();
   });
 
-  init();
-  ```js
-// ── COMPARE ───────────────────────────────
-let compareList = []; // max 2 tool IDs
- 
-function toggleCompare(id) {
-  if (compareList.includes(id)) {
-    compareList = compareList.filter(x => x !== id);
-  } else {
-    if (compareList.length >= 2) {
-      // Replace the second slot
-      compareList[1] = id;
+  // ── Compare ───────────────────────────────
+  function toggleCompare(id) {
+    if (compareList.includes(id)) {
+      compareList = compareList.filter(x => x !== id);
     } else {
-      compareList.push(id);
+      if (compareList.length >= 2) {
+        compareList[1] = id;
+      } else {
+        compareList.push(id);
+      }
     }
+    updateCompareBar();
   }
-  updateCompareBar();
-}
- 
-function updateCompareBar() {
-  const bar = document.getElementById("compareBar");
-  const goBtn = document.getElementById("compareGoBtn");
- 
-  // Update all compare button states
-  document.querySelectorAll(".tv-compare-btn").forEach(btn => {
-    const id = Number(btn.id.replace("cmp-", ""));
-    btn.classList.toggle("selected", compareList.includes(id));
-    btn.textContent = compareList.includes(id) ? "✓ Added" : "+ Compare";
-  });
- 
-  // Render slots
-  const slots = document.getElementById("compareSlots");
-  slots.innerHTML = [0, 1].map(i => {
-    const tool = compareList[i] ? TOOLS.find(t => t.id === compareList[i]) : null;
-    if (tool) {
-      return `
-        <div class="tv-compare-slot">
-          <img src="${tool.logo}" alt="${tool.name}" onerror="this.style.display='none'">
-          <span class="tv-compare-slot-name">${tool.name}</span>
-          <button class="tv-compare-slot-remove" onclick="toggleCompare(${tool.id})">✕</button>
-        </div>`;
-    }
-    return `<div class="tv-compare-slot empty">Pick a tool</div>`;
-  }).join("");
- 
-  // Show/hide bar
-  bar.classList.toggle("visible", compareList.length > 0);
-  goBtn.disabled = compareList.length < 2;
-}
- 
-function clearCompare() {
-  compareList = [];
-  updateCompareBar();
-  document.getElementById("compareBar").classList.remove("visible");
-}
- 
-function openCompare() {
-  if (compareList.length < 2) return;
-  const [a, b] = compareList.map(id => TOOLS.find(t => t.id === id));
- 
-  const rows = [
-    {
-      label: "Category",
-      a: a.category, b: b.category,
-      winner: null
-    },
-    {
-      label: "Pricing",
-      a: a.pricing, b: b.pricing,
-      winner: ["Free", "Freemium", "Paid"].indexOf(a.pricing) <
-              ["Free", "Freemium", "Paid"].indexOf(b.pricing) ? "a" : "b"
-    },
-    {
-      label: "Rating",
-      a: `⭐ ${a.rating}`, b: `⭐ ${b.rating}`,
-      winner: a.rating >= b.rating ? "a" : "b"
-    },
-    {
-      label: "Features",
-      aList: a.features, bList: b.features,
-      winner: null
-    },
-    {
-      label: "Visit",
-      aLink: a.url, bLink: b.url, aName: a.name, bName: b.name,
-      winner: null
-    }
-  ];
- 
-  document.getElementById("compareTable").innerHTML = `
-    <div class="tv-compare-table">
- 
-      <!-- Header row -->
-      <div class="tv-ct-cell tv-ct-label"></div>
-      <div class="tv-ct-cell tv-ct-head">
-        <img src="${a.logo}" alt="${a.name}" onerror="this.style.display='none'">
-        <div>
-          <div class="tv-ct-head-name">${a.name}</div>
-          <div class="tv-ct-head-cat">${a.category}</div>
-        </div>
-      </div>
-      <div class="tv-ct-cell tv-ct-head">
-        <img src="${b.logo}" alt="${b.name}" onerror="this.style.display='none'">
-        <div>
-          <div class="tv-ct-head-name">${b.name}</div>
-          <div class="tv-ct-head-cat">${b.category}</div>
-        </div>
-      </div>
- 
-      ${rows.map((row, i) => {
-        const alt = i % 2 === 0 ? "" : "alt";
- 
-        if (row.aList) {
-          // Features row
-          return `
-            <div class="tv-ct-cell tv-ct-label">${row.label}</div>
-            <div class="tv-ct-cell tv-ct-value ${alt}">
-              <ul class="tv-ct-features">
-                ${row.aList.map(f => `<li>${f}</li>`).join("")}
-              </ul>
-            </div>
-            <div class="tv-ct-cell tv-ct-value ${alt}">
-              <ul class="tv-ct-features">
-                ${row.bList.map(f => `<li>${f}</li>`).join("")}
-              </ul>
-            </div>`;
-        }
- 
-        if (row.aLink) {
-          // Visit row
-          return `
-            <div class="tv-ct-cell tv-ct-label">${row.label}</div>
-            <div class="tv-ct-cell tv-ct-value ${alt}">
-              <a href="${row.aLink}" target="_blank" rel="noopener noreferrer"
-                 class="tv-ct-visit">Visit ${row.aName} →</a>
-            </div>
-            <div class="tv-ct-cell tv-ct-value ${alt}">
-              <a href="${row.bLink}" target="_blank" rel="noopener noreferrer"
-                 class="tv-ct-visit">Visit ${row.bName} →</a>
-            </div>`;
-        }
- 
-        // Regular row
+
+  function updateCompareBar() {
+    const bar   = document.getElementById("compareBar");
+    const goBtn = document.getElementById("compareGoBtn");
+
+    document.querySelectorAll(".tv-compare-btn").forEach(btn => {
+      const id = Number(btn.id.replace("cmp-", ""));
+      btn.classList.toggle("selected", compareList.includes(id));
+      btn.textContent = compareList.includes(id) ? "✓ Added" : "+ Compare";
+    });
+
+    const slots = document.getElementById("compareSlots");
+    slots.innerHTML = [0, 1].map(i => {
+      const tool = compareList[i] ? TOOLS.find(t => t.id === compareList[i]) : null;
+      if (tool) {
         return `
-          <div class="tv-ct-cell tv-ct-label">${row.label}</div>
-          <div class="tv-ct-cell tv-ct-value ${alt} ${row.winner === "a" ? "tv-ct-winner" : ""}">
-            ${row.a}
-          </div>
-          <div class="tv-ct-cell tv-ct-value ${alt} ${row.winner === "b" ? "tv-ct-winner" : ""}">
-            ${row.b}
+          <div class="tv-compare-slot">
+            <img src="${tool.logo}" alt="${tool.name}" onerror="this.style.display='none'">
+            <span class="tv-compare-slot-name">${tool.name}</span>
+            <button class="tv-compare-slot-remove" onclick="toggleCompare(${tool.id})">✕</button>
           </div>`;
-      }).join("")}
- 
-    </div>
-  `;
- 
-  document.getElementById("compareOverlay").classList.add("open");
-  document.getElementById("comparePanel").classList.add("open");
-  document.body.style.overflow = "hidden";
-}
- 
-function closeCompare() {
-  document.getElementById("compareOverlay").classList.remove("open");
-  document.getElementById("comparePanel").classList.remove("open");
-  document.body.style.overflow = "";
-}
-```
+      }
+      return `<div class="tv-compare-slot empty">Pick a tool</div>`;
+    }).join("");
+
+    bar.classList.toggle("visible", compareList.length > 0);
+    goBtn.disabled = compareList.length < 2;
+  }
+
+  function clearCompare() {
+    compareList = [];
+    updateCompareBar();
+    document.getElementById("compareBar").classList.remove("visible");
+  }
+
+  function openCompare() {
+    if (compareList.length < 2) return;
+    const [a, b] = compareList.map(id => TOOLS.find(t => t.id === id));
+
+    const rows = [
+      { label: "Category", a: a.category, b: b.category, winner: null },
+      {
+        label: "Pricing", a: a.pricing, b: b.pricing,
+        winner: ["Free","Freemium","Paid"].indexOf(a.pricing) <=
+                ["Free","Freemium","Paid"].indexOf(b.pricing) ? "a" : "b"
+      },
+      {
+        label: "Rating", a: "⭐ " + a.rating, b: "⭐ " + b.rating,
+        winner: a.rating >= b.rating ? "a" : "b"
+      },
+      { label: "Features", aList: a.features, bList: b.features, winner: null },
+      { label: "Visit", aLink: a.url, bLink: b.url, aName: a.name, bName: b.name, winner: null }
+    ];
+
+    document.getElementById("compareTable").innerHTML = `
+      <div class="tv-compare-table">
+        <div class="tv-ct-cell tv-ct-label"></div>
+        <div class="tv-ct-cell tv-ct-head">
+          <img src="${a.logo}" alt="${a.name}" onerror="this.style.display='none'">
+          <div>
+            <div class="tv-ct-head-name">${a.name}</div>
+            <div class="tv-ct-head-cat">${a.category}</div>
+          </div>
+        </div>
+        <div class="tv-ct-cell tv-ct-head">
+          <img src="${b.logo}" alt="${b.name}" onerror="this.style.display='none'">
+          <div>
+            <div class="tv-ct-head-name">${b.name}</div>
+            <div class="tv-ct-head-cat">${b.category}</div>
+          </div>
+        </div>
+        ${rows.map((row, i) => {
+          const alt = i % 2 === 0 ? "" : "alt";
+          if (row.aList) {
+            return `
+              <div class="tv-ct-cell tv-ct-label">${row.label}</div>
+              <div class="tv-ct-cell tv-ct-value ${alt}">
+                <ul class="tv-ct-features">${row.aList.map(f => `<li>${f}</li>`).join("")}</ul>
+              </div>
+              <div class="tv-ct-cell tv-ct-value ${alt}">
+                <ul class="tv-ct-features">${row.bList.map(f => `<li>${f}</li>`).join("")}</ul>
+              </div>`;
+          }
+          if (row.aLink) {
+            return `
+              <div class="tv-ct-cell tv-ct-label">${row.label}</div>
+              <div class="tv-ct-cell tv-ct-value ${alt}">
+                <a href="${row.aLink}" target="_blank" rel="noopener noreferrer"
+                   class="tv-ct-visit">Visit ${row.aName} →</a>
+              </div>
+              <div class="tv-ct-cell tv-ct-value ${alt}">
+                <a href="${row.bLink}" target="_blank" rel="noopener noreferrer"
+                   class="tv-ct-visit">Visit ${row.bName} →</a>
+              </div>`;
+          }
+          return `
+            <div class="tv-ct-cell tv-ct-label">${row.label}</div>
+            <div class="tv-ct-cell tv-ct-value ${alt} ${row.winner === "a" ? "tv-ct-winner" : ""}">${row.a}</div>
+            <div class="tv-ct-cell tv-ct-value ${alt} ${row.winner === "b" ? "tv-ct-winner" : ""}">${row.b}</div>`;
+        }).join("")}
+      </div>
+    `;
+
+    document.getElementById("compareOverlay").classList.add("open");
+    document.getElementById("comparePanel").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeCompare() {
+    document.getElementById("compareOverlay").classList.remove("open");
+    document.getElementById("comparePanel").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  init();
 </script>
-  ```html
-<!-- COMPARE BAR -->
-<div class="tv-compare-bar" id="compareBar">
-  <span class="tv-compare-bar-label">Compare</span>
-  <div class="tv-compare-slots" id="compareSlots"></div>
-  <button class="tv-compare-go-btn" id="compareGoBtn" onclick="openCompare()" disabled>
-    Compare →
-  </button>
-  <button class="tv-compare-clear" onclick="clearCompare()">Clear</button>
-</div>
- 
-<!-- COMPARE OVERLAY -->
-<div class="tv-compare-overlay" id="compareOverlay" onclick="closeCompare()"></div>
- 
-<!-- COMPARE PANEL -->
-<div class="tv-compare-panel" id="comparePanel">
-  <div class="tv-compare-panel-inner">
-    <div class="tv-compare-panel-header">
-      <span class="tv-compare-panel-title">Comparing tools</span>
-      <button class="tv-compare-close" onclick="closeCompare()">
-        <i class="fas fa-xmark"></i>
-      </button>
-    </div>
-    <div id="compareTable"></div>
-  </div>
-</div>
-```
-  
 </body>
 </html>
