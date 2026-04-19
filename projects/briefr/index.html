@@ -256,6 +256,11 @@
   document.getElementById("searchInput").addEventListener("keydown", e => {
     if (e.key === "Enter") searchNews();
   });
+
+  function quickSearch(term) {
+  document.getElementById("searchInput").value = term;
+  searchNews();
+}
 </script>
 </body>
 </html>
