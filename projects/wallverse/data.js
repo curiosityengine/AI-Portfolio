@@ -125,12 +125,12 @@ async function fetchPicsum(query, page) {
 }
 
 // ── Main function (called by script.js) ──────────────
-async function searchWallpapers(query = "nature", page = 1, includeNSFW = false, color = null) {
+async function searchWallpapers(query = "nature", page = 1, includeNSFW = false, color = null, width = null, height = null) {
   const [unsplash, pixabay, pexels, wallhaven, picsum] = await Promise.all([
     fetchUnsplash(query, page, color, width, height),
     fetchPixabay(query, page),
     fetchPexels(query, page),
-    fetchWallhaven(query, page, includeNSFW),   // ← pass the flag
+    fetchWallhaven(query, page, includeNSFW),
     fetchPicsum(query, page)
   ]);
 
