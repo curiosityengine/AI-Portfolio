@@ -615,3 +615,204 @@ a { text-decoration: none; color: inherit; }
   transition: opacity 0.15s;
 }
 .tv-ct-visit:hover { opacity: 0.85; }
+
+/* ── BUILD MY STACK ── */
+
+/* Navbar stack button */
+.tv-stack-nav-btn {
+  font-size: 0.78rem; color: var(--accent);
+  padding: 0.4rem 0.85rem;
+  border: 1px solid rgba(79,142,255,0.3);
+  border-radius: 999px; background: var(--accent-dim);
+  cursor: pointer; font-family: var(--font-body);
+  transition: all 0.15s; white-space: nowrap;
+}
+.tv-stack-nav-btn:hover {
+  background: rgba(79,142,255,0.15);
+  border-color: rgba(79,142,255,0.5);
+}
+.tv-stack-nav-btn.active {
+  background: var(--accent); color: #fff;
+  border-color: var(--accent);
+}
+
+/* Stack mode banner */
+.tv-stack-banner {
+  display: none;
+  position: sticky; top: 60px; z-index: 89;
+  background: rgba(79,142,255,0.08);
+  border-bottom: 1px solid rgba(79,142,255,0.2);
+  padding: 0.65rem 2.5rem;
+  align-items: center; gap: 1rem;
+  justify-content: space-between;
+}
+.tv-stack-banner.visible { display: flex; }
+.tv-stack-banner-left {
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.tv-stack-banner-label {
+  font-size: 0.8rem; color: var(--accent); font-weight: 500;
+}
+.tv-stack-banner-hint {
+  font-size: 0.75rem; color: var(--muted);
+}
+.tv-stack-count {
+  font-size: 0.72rem; color: var(--accent);
+  background: rgba(79,142,255,0.15);
+  border: 1px solid rgba(79,142,255,0.25);
+  border-radius: 999px; padding: 0.15rem 0.6rem;
+}
+.tv-stack-banner-right {
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.tv-stack-share-btn {
+  padding: 0.45rem 1rem;
+  background: var(--accent); color: white;
+  font-family: var(--font-body); font-size: 0.78rem;
+  border: none; border-radius: 8px; cursor: pointer;
+  transition: opacity 0.15s;
+}
+.tv-stack-share-btn:hover { opacity: 0.85; }
+.tv-stack-share-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.tv-stack-cancel-btn {
+  font-size: 0.75rem; color: var(--muted);
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-body); transition: color 0.15s;
+}
+.tv-stack-cancel-btn:hover { color: var(--text); }
+
+/* Card selected state for stack */
+.tv-card.stack-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(79,142,255,0.2);
+}
+.tv-card.stack-selected .tv-stack-pick-btn {
+  background: var(--accent); color: white;
+  border-color: var(--accent);
+}
+
+/* Pick button on card */
+.tv-stack-pick-btn {
+  font-size: 0.72rem; color: var(--muted-light);
+  padding: 0.28rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 6px; transition: all 0.15s;
+  background: transparent; cursor: pointer;
+  font-family: var(--font-body); white-space: nowrap;
+  display: none;
+}
+.stack-mode .tv-stack-pick-btn { display: inline-block; }
+.stack-mode .tv-compare-btn { display: none; }
+
+/* ── STACK VIEW PANEL ── */
+.tv-stack-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+  opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+.tv-stack-overlay.open { opacity: 1; pointer-events: all; }
+
+.tv-stack-panel {
+  position: fixed; inset: 0; z-index: 301;
+  background: #0a0a0a; overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.tv-stack-panel.open { transform: translateY(0); }
+
+.tv-stack-panel-inner {
+  max-width: 780px; margin: 0 auto; padding: 2.5rem 2rem 5rem;
+}
+
+.tv-stack-panel-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 2.5rem;
+}
+.tv-stack-panel-title {
+  font-family: var(--font-display); font-size: 1.4rem; font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.tv-stack-panel-subtitle {
+  font-size: 0.78rem; color: var(--muted); margin-top: 0.25rem;
+}
+.tv-stack-panel-close {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--muted); transition: color 0.15s;
+  flex-shrink: 0;
+}
+.tv-stack-panel-close:hover { color: var(--text); }
+
+/* Stack tools list */
+.tv-stack-list {
+  display: flex; flex-direction: column; gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+.tv-stack-item {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1rem 1.25rem;
+  transition: border-color 0.15s; cursor: pointer;
+}
+.tv-stack-item:hover { border-color: var(--border-hover); }
+.tv-stack-item-num {
+  font-family: var(--font-display); font-size: 1.1rem;
+  font-weight: 800; color: var(--border-hover);
+  width: 24px; text-align: center; flex-shrink: 0;
+}
+.tv-stack-item-logo {
+  width: 40px; height: 40px; border-radius: 10px;
+  object-fit: contain; background: #1a1a1a; padding: 5px; flex-shrink: 0;
+}
+.tv-stack-item-logo-fallback {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--accent-dim);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 800;
+  font-size: 1rem; color: var(--accent); flex-shrink: 0;
+}
+.tv-stack-item-info { flex: 1; }
+.tv-stack-item-name {
+  font-family: var(--font-display); font-size: 0.95rem; font-weight: 700;
+}
+.tv-stack-item-desc {
+  font-size: 0.78rem; color: var(--muted); margin-top: 2px;
+}
+.tv-stack-item-pricing {
+  font-size: 0.68rem; padding: 0.18rem 0.55rem;
+  border-radius: 999px; font-weight: 500; flex-shrink: 0;
+}
+
+/* Share row */
+.tv-stack-share-row {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1.1rem 1.25rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.tv-stack-url {
+  flex: 1; font-size: 0.78rem; color: var(--muted);
+  font-family: var(--font-body); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.tv-stack-copy-btn {
+  padding: 0.5rem 1rem; background: var(--accent); color: white;
+  font-family: var(--font-body); font-size: 0.78rem;
+  border: none; border-radius: 8px; cursor: pointer;
+  transition: opacity 0.15s; white-space: nowrap; flex-shrink: 0;
+}
+.tv-stack-copy-btn:hover { opacity: 0.85; }
+
+/* Shared stack banner */
+.tv-shared-stack-banner {
+  display: none;
+  background: rgba(79,142,255,0.06);
+  border: 1px solid rgba(79,142,255,0.2);
+  border-radius: 12px; padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  align-items: center; gap: 0.75rem;
+}
+.tv-shared-stack-banner.visible { display: flex; }
+.tv-shared-stack-banner i { color: var(--accent); font-size: 1rem; }
+.tv-shared-stack-banner-text { font-size: 0.82rem; color: var(--muted-light); flex: 1; }
+.tv-shared-stack-banner-text strong { color: var(--text); }
