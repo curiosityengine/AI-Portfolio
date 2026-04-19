@@ -308,7 +308,20 @@ async function formatCode() {
     }, 2000);
   }
 }
- 
+ // ── Live counter ──────────────────────────
+function updateCounter() {
+  const val   = document.getElementById("content").value;
+  const chars = val.length;
+  const words = val.trim() === "" ? 0 : val.trim().split(/\s+/).length;
+  const lines = val === "" ? 1 : val.split("\n").length;
+
+  document.getElementById("counterChars").textContent = `${chars.toLocaleString()} char${chars !== 1 ? "s" : ""}`;
+  document.getElementById("counterWords").textContent = `${words.toLocaleString()} word${words !== 1 ? "s" : ""}`;
+  document.getElementById("counterLines").textContent = `${lines.toLocaleString()} line${lines !== 1 ? "s" : ""}`;
+}
+
+document.getElementById("content").addEventListener("input", updateCounter);
+  
 // Auto-format on Ctrl+Shift+F
 document.addEventListener("keydown", e => {
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "F") {
