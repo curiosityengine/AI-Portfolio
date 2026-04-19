@@ -227,45 +227,29 @@ document.querySelectorAll(".wv-swatch").forEach(b => b.classList.remove("active"
     const favs    = getFavs();
     const history = getHistory();
 
-    // ── Favourites section ──
-    if (favs.length) {
-      const favHeader = document.createElement("div");
-      favHeader.className = "wv-grid-header";
-      favHeader.style.marginBottom = "1rem";
-      favHeader.innerHTML = `<span class="wv-grid-title" style="font-size:0.78rem;color:var(--muted)">♥ Favourites · ${favs.length} saved</span>`;
-      gallery.appendChild(favHeader);
-
-      const favGrid = document.createElement("div");
-      favGrid.className = "wv-masonry";
-      favGrid.style.marginBottom = "2.5rem";
-      favs.forEach(item => favGrid.appendChild(makeCard(item)));
-      gallery.appendChild(favGrid);
-    }
-
-    // ── Download history section ──
-    if (history.length) {
-      const histHeader = document.createElement("div");
-      histHeader.className = "wv-grid-header";
-      histHeader.style.marginBottom = "1rem";
-      histHeader.innerHTML = `
-        <span class="wv-grid-title" style="font-size:0.78rem;color:var(--muted)">↓ Recently Downloaded · ${history.length}</span>
-        <button class="wv-clear-history" onclick="clearHistory()">Clear</button>
-      `;
-      gallery.appendChild(histHeader);
-
-      const histGrid = document.createElement("div");
-      histGrid.className = "wv-masonry";
-      history.forEach(item => histGrid.appendChild(makeCard(item)));
-      gallery.appendChild(histGrid);
-    }
-
-    // ── Empty state ──
     if (!favs.length && !history.length) {
       wallCount.textContent = "";
       emptyState.style.display = "block";
       emptyState.innerHTML = '<i class="fas fa-heart"></i>Nothing here yet. Save or download wallpapers to see them here.';
-    } else {
-      wallCount.textContent = `${favs.length + history.length} total`;
+      return;
+    }
+
+    wallCount.textContent = `${favs.length + history.length} total`;
+
+    if (favs.length) {
+      const label = document.createElement("p");
+      label.style.cssText = "font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem;";
+      label.textContent = `♥ Favourites · ${favs.length} saved`;
+      gallery.appendChild(label);
+      favs.forEach(item => gallery.appendChild(makeCard(item)));
+    }
+
+    if (history.length) {
+      const label = document.createElement("div");
+      label.style.cssText = "display:flex;justify-content:space-between;align-items:center;font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin:2rem 0 1rem;";
+      label.innerHTML = `<span>↓ Recently Downloaded · ${history.length}</span><button class="wv-clear-history" onclick="clearHistory()">Clear</button>`;
+      gallery.appendChild(label);
+      history.forEach(item => gallery.appendChild(makeCard(item)));
     }
 
   } else {
