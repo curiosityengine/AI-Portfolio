@@ -672,6 +672,34 @@
   }
 
   init();
+  // ── Tool of the Day ───────────────────────
+function renderToolOfDay() {
+  const now   = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff  = now - start;
+  const oneDay = 1000 * 60 * 60 * 24;
+  const dayOfYear = Math.floor(diff / oneDay);
+  const tool = TOOLS[dayOfYear % TOOLS.length];
+
+  document.getElementById("toolOfDay").innerHTML = `
+    <div class="tv-totd-inner" onclick="openModal(${tool.id})">
+      <span class="tv-totd-badge">⚡ Tool of the Day</span>
+      <img class="tv-totd-logo" src="${tool.logo}" alt="${tool.name}"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="tv-totd-logo-fallback" style="display:none">${tool.name[0]}</div>
+      <div class="tv-totd-info">
+        <div class="tv-totd-name">${tool.name}</div>
+        <div class="tv-totd-desc">${tool.description}</div>
+      </div>
+      <div class="tv-totd-meta">
+        <div class="tv-card-rating"><i class="fas fa-star"></i> ${tool.rating}</div>
+        <span class="tv-pricing ${pricingClass(tool.pricing)}">${tool.pricing}</span>
+      </div>
+    </div>
+  `;
+}
+
+renderToolOfDay();
 </script>
 </body>
 </html>
