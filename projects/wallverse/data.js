@@ -4,10 +4,10 @@ const PEXELS_KEY   = "SOUjV6HIxdiZpJQkA2cey65IKj68rTH8ZJzfF6QulaA8KfXNwMtHTloo";
 const WALLHAVEN_KEY = "yxQAVZjLLwHJKS5yyYcLhIcOQrrNFw7i";
 
 // ── Unsplash ──────────────────────────────────────────
-async function fetchUnsplash(query, page) {
+async function fetchUnsplash(query, page, color = null) {
   try {
     const res = await fetch(
-      `https://api.unsplash.com/search/photos?query=${query}&page=${page}&per_page=15&orientation=landscape`,
+      `https://api.unsplash.com/search/photos?query=${query}&page=${page}&per_page=15&orientation=landscape${color ? `&color=${color}` : ""}`,
       { headers: { Authorization: `Client-ID ${UNSPLASH_KEY}` } }
     );
     const data = await res.json();
@@ -125,9 +125,9 @@ async function fetchPicsum(query, page) {
 }
 
 // ── Main function (called by script.js) ──────────────
-async function searchWallpapers(query = "nature", page = 1, includeNSFW = false) {
+async function searchWallpapers(query = "nature", page = 1, includeNSFW = false, color = null) {
   const [unsplash, pixabay, pexels, wallhaven, picsum] = await Promise.all([
-    fetchUnsplash(query, page),
+    fetchUnsplash(query, page, color),
     fetchPixabay(query, page),
     fetchPexels(query, page),
     fetchWallhaven(query, page, includeNSFW),   // ← pass the flag
