@@ -278,3 +278,48 @@ a { text-decoration: none; color: inherit; }
   .wv-catbar { padding: 0 1.25rem; }
   .wv-modal-img { max-height: 70vh; }
 }
+
+/* ── WALLPAPER OF THE DAY ── */
+.wv-wotd {
+  max-width: 1200px; margin: 0 auto 0;
+  padding: 0 2rem 1.5rem;
+}
+.wv-wotd-inner {
+  position: relative; border-radius: 16px; overflow: hidden;
+  cursor: pointer; height: 220px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.wv-wotd-inner:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.wv-wotd-inner img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.wv-wotd-inner:hover img { transform: scale(1.03); }
+.wv-wotd-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 60%);
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 2rem;
+}
+.wv-wotd-badge {
+  font-size: 0.6rem; color: var(--accent);
+  text-transform: uppercase; letter-spacing: 0.2em;
+  font-weight: 600; margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 0.4rem;
+}
+.wv-wotd-badge::before {
+  content: ''; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--accent);
+  animation: wvpulse 2s ease infinite;
+}
+.wv-wotd-title {
+  font-family: var(--font-display); font-size: 1.4rem;
+  font-weight: 800; color: white; line-height: 1.1;
+  margin-bottom: 0.4rem;
+}
+.wv-wotd-meta {
+  font-size: 0.72rem; color: rgba(255,255,255,0.5);
+}
