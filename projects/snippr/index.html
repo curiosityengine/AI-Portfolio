@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Snippr — Share code and text instantly. No account needed.">
+  <title>Snippr — Instant Code Sharing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="snippr.css">
+</head>
+<body>
+
+<nav class="sn-nav">
+  <a href="index.html" class="sn-logo">Snip<span>pr</span></a>
+  <div class="sn-nav-right">
+    <span class="sn-tagline">instant code sharing</span>
+  </div>
+</nav>
+
+<main class="sn-main">
+  <div class="sn-hero">
+    <div class="sn-hero-badge">No account needed</div>
+    <h1>Share code.<br><em>Instantly.</em></h1>
+    <p class="sn-hero-sub">Paste your code or text, get a shareable link in seconds.</p>
+  </div>
+
+  <div class="sn-layout">
+    <!-- LEFT: FORM -->
+    <div class="sn-form-wrap">
+      <div class="sn-card">
+
+        <div class="sn-field">
+          <label>Title</label>
+          <input type="text" id="title" placeholder="Give it a name..." autocomplete="off">
+        </div>
+
+        <div class="sn-field">
+          <div class="sn-field-header">
+            <label>Content</label>
+            <select id="language">
+              <option value="plaintext">Plain Text</option>
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+              <option value="html">HTML</option>
+              <option value="css">CSS</option>
+              <option value="sql">SQL</option>
+              <option value="bash">Bash</option>
+              <option value="json">JSON</option>
+              <option value="typescript">TypeScript</option>
+              <option value="java">Java</option>
+              <option value="cpp">C++</option>
+              <option value="go">Go</option>
+            </select>
+          </div>
+          <textarea id="content" placeholder="Paste your code or text here..."></textarea>
+        </div>
+
+        <div class="sn-row">
+          <div class="sn-field">
+            <label>Expiry</label>
+            <select id="expiry">
+              <option value="">Never</option>
+              <option value="10m">10 Minutes</option>
+              <option value="1h">1 Hour</option>
+              <option value="1d">1 Day</option>
+              <option value="1w">1 Week</option>
+            </select>
+          </div>
+          <div class="sn-field">
+            <label>Visibility</label>
+            <select id="visibility">
+              <option value="public">Public</option>
+              <option value="unlisted">Unlisted</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sn-field">
+          <label>Password <span class="sn-optional">optional</span></label>
+          <div class="sn-pass-wrap">
+            <input type="password" id="password" placeholder="Protect with a password...">
+            <button class="sn-pass-toggle" onclick="togglePass()" type="button">👁</button>
+          </div>
+        </div>
+
+        <button class="sn-submit" id="submitBtn" onclick="createPaste()">
+          <span id="submitText">Create Snippet →</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: SIDEBAR -->
+    <div class="sn-sidebar">
+      <div class="sn-card">
+        <div class="sn-sidebar-title">Recent Public Snippets</div>
+        <div id="recentList">
+          <div class="sn-loading">Loading...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="sn-footer">
+  © 2026 Snippr · Built by Prince
+</footer>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL  = "https://tbygaanjbsfutsixpbnj.supabase.co";
+  const SUPABASE_KEY  = "sb_publishable_lHVoDfC4d6t9J24igd3jvA_zhM4ZT07";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ── Helpers ───────────────────────────────
+  function randomCode(len = 7) {
+    const chars = "abcdefghijkmnpqrstuvwxyz23456789";
+    return Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  }
+
+  function expiryDate(val) {
+    if (!val) return null;
+    const now = new Date();
+    const map = { "10m": 10, "1h": 60, "1d": 1440, "1w": 10080 };
+    now.setMinutes(now.getMinutes() + (map[val] || 0));
+    return now.toISOString();
+  }
+
+  async function hashPassword(pass) {
+    if (!pass) return null;
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pass));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  // ── Create paste ──────────────────────────
+  async function createPaste() {
+    const content = document.getElementById("content").value.trim();
+    if (!content) {
+      document.getElementById("content").focus();
+      return;
+    }
+
+    const btn  = document.getElementById("submitBtn");
+    const text = document.getElementById("submitText");
+    btn.disabled = true;
+    text.textContent = "Creating...";
+
+    try {
+      const short_code    = randomCode();
+      const password_raw  = document.getElementById("password").value;
+      const password_hash = await hashPassword(password_raw);
+
+      const { error } = await sb.from("pastes").insert({
+        short_code,
+        title:         document.getElementById("title").value.trim() || "Untitled",
+        content,
+        language:      document.getElementById("language").value,
+        expiry:        expiryDate(document.getElementById("expiry").value),
+        password_hash,
+        visibility:    document.getElementById("visibility").value,
+        views:         0,
+      });
+
+      if (error) throw error;
+
+      // Redirect to view page
+      window.location.href = `view.html?code=${short_code}`;
+    } catch (err) {
+      console.error(err);
+      text.textContent = "Error — try again";
+      btn.disabled = false;
+      setTimeout(() => text.textContent = "Create Snippet →", 2000);
+    }
+  }
+
+  // ── Load recent pastes ────────────────────
+  async function loadRecent() {
+    const { data, error } = await sb
+      .from("pastes")
+      .select("short_code, title, created_at")
+      .eq("visibility", "public")
+      .order("created_at", { ascending: false })
+      .limit(8);
+
+    const list = document.getElementById("recentList");
+    if (error || !data?.length) {
+      list.innerHTML = `<p class="sn-empty">No public snippets yet.</p>`;
+      return;
+    }
+
+    list.innerHTML = data.map(p => `
+      <a href="view.html?code=${p.short_code}" class="sn-recent-item">
+        <span class="sn-recent-title">${p.title || "Untitled"}</span>
+        <span class="sn-recent-time">${timeAgo(p.created_at)}</span>
+      </a>
+    `).join("");
+  }
+
+  function timeAgo(iso) {
+    const diff = Math.floor((Date.now() - new Date(iso)) / 1000);
+    if (diff < 60) return `${diff}s ago`;
+    if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+    return `${Math.floor(diff/86400)}d ago`;
+  }
+
+  // ── Password toggle ───────────────────────
+  function togglePass() {
+    const f = document.getElementById("password");
+    f.type = f.type === "password" ? "text" : "password";
+  }
+
+  // ── Keyboard shortcut ─────────────────────
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") createPaste();
+  });
+
+  loadRecent();
+</script>
+</body>
+</html>
