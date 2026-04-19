@@ -21,6 +21,9 @@
     <button class="wv-fav-btn" id="favToggle" onclick="toggleFavView()">
       ♡ Favourites
     </button>
+    <button class="wv-fav-btn" id="randomBtn" onclick="showRandom()">
+  ⚡ Random
+</button>
   </div>
 </nav>
 
@@ -405,6 +408,35 @@ async function renderWotd() {
       </div>
     </div>
   `;
+}
+
+  // ── Random Wallpaper ──────────────────────
+const randomPool = [
+  "nature", "space", "ocean", "mountains", "forest",
+  "city", "abstract", "aurora", "desert", "storm",
+  "waterfall", "canyon", "glacier", "sunset", "minimal"
+];
+
+async function showRandom() {
+  const btn = document.getElementById("randomBtn");
+  btn.textContent = "⏳ Loading...";
+  btn.disabled = true;
+
+  try {
+    const query = randomPool[Math.floor(Math.random() * randomPool.length)];
+    const page  = Math.floor(Math.random() * 5) + 1;
+    const results = await searchWallpapers(query, page);
+
+    if (results.length) {
+      const item = results[Math.floor(Math.random() * results.length)];
+      openModal(item);
+    }
+  } catch {
+    // silently fail
+  } finally {
+    btn.textContent = "⚡ Random";
+    btn.disabled = false;
+  }
 }
   // ── Init ──────────────────────────────────
   renderWotd();
