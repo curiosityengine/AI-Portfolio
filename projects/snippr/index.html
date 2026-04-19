@@ -61,9 +61,8 @@
       <option value="cpp">C++</option>
       <option value="go">Go</option>
     </select>
-    <button type="button" class="sn-format-btn" id="formatBtn" onclick="formatCode()">
-      ✦ Format
-    </button>
+    <button type="button" class="sn-format-btn" id="formatBtn" onclick="formatCode()">✦ Format</button>
+  <button type="button" class="sn-format-btn" id="loremBtn" onclick="insertLorem()">¶ Generate Lorem Ipsum</button>
   </div>
 </div>
           <textarea id="content" placeholder="Paste your code or text here..."></textarea>
@@ -329,6 +328,31 @@ document.addEventListener("keydown", e => {
     formatCode();
   }
 });
+
+  // ── Lorem ipsum generator ─────────────────
+const LOREM_WORDS = ["lorem","ipsum","dolor","sit","amet","consectetur","adipiscing","elit","sed","do","eiusmod","tempor","incididunt","ut","labore","et","dolore","magna","aliqua","enim","ad","minim","veniam","quis","nostrud","exercitation","ullamco","laboris","nisi","aliquip","ex","ea","commodo","consequat","duis","aute","irure","in","reprehenderit","voluptate","velit","esse","cillum","fugiat","nulla","pariatur","excepteur","sint","occaecat","cupidatat","non","proident","sunt","culpa","qui","officia","deserunt","mollit","anim","id","est","laborum"];
+
+function loremSentence() {
+  const len = Math.floor(Math.random() * 10) + 8;
+  const words = Array.from({ length: len }, (_, i) => {
+    const w = LOREM_WORDS[Math.floor(Math.random() * LOREM_WORDS.length)];
+    return i === 0 ? w.charAt(0).toUpperCase() + w.slice(1) : w;
+  });
+  return words.join(" ") + ".";
+}
+
+function insertLorem() {
+  const sentences = Array.from({ length: 5 }, loremSentence);
+  const paragraph = sentences.join(" ");
+  const textarea  = document.getElementById("content");
+  textarea.value  = paragraph + "\n\n" + sentences.slice(0, 3).join(" ");
+  updateCounter();
+  textarea.focus();
+
+  const btn = document.getElementById("loremBtn");
+  btn.textContent = "¶ Inserted!";
+  setTimeout(() => btn.textContent = "¶ Lorem", 1500);
+}
 </script>
 </body>
 </html>
