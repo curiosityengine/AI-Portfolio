@@ -15,7 +15,6 @@ Live: **[princeai.eu.cc](https://princeai.eu.cc)**
 | [ToolVerse](https://princeai.eu.cc/projects/toolverse) | Curated AI tools directory with comparison and stack builder | Groq, Vanilla JS |
 | [Quoter](https://princeai.eu.cc/projects/quoter) | AI quote image generator with mood-matched backgrounds | Groq, Unsplash, Canvas API |
 | [WallVerse](https://princeai.eu.cc/projects/wallverse) | Wallpaper discovery app | Unsplash API |
-| Cloud Pastebin | Text sharing app with auth, QR, and admin panel | Flask, PostgreSQL, Docker |
 
 ---
 
