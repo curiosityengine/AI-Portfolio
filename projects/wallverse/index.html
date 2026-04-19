@@ -320,8 +320,36 @@
       loadMore();
     }
   });
+// ── Wallpaper of the Day ──────────────────
+async function renderWotd() {
+  const pool = [
+    "mountains", "ocean", "forest", "aurora", "desert",
+    "waterfall", "sunrise", "storm", "canyon", "glacier",
+    "volcano", "coral reef", "savanna", "fjord", "milky way"
+  ];
+  const now   = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const day   = Math.floor((now - start) / 86400000);
+  const query = pool[day % pool.length];
 
+  const results = await searchWallpapers(query, 1);
+  if (!results.length) return;
+
+  const item = results[Math.floor(Math.random() * Math.min(results.length, 5))];
+
+  document.getElementById("wotd").innerHTML = `
+    <div class="wv-wotd-inner" onclick='openModal(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
+      <img src="${item.url}" alt="Wallpaper of the Day">
+      <div class="wv-wotd-overlay">
+        <div class="wv-wotd-badge">Wallpaper of the Day</div>
+        <div class="wv-wotd-title">${query.charAt(0).toUpperCase() + query.slice(1)}</div>
+        <div class="wv-wotd-meta">Click to preview · ${item.source}</div>
+      </div>
+    </div>
+  `;
+}
   // ── Init ──────────────────────────────────
+  renderWotd();
   loadMore();
 </script>
 </body>
