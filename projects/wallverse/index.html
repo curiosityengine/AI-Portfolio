@@ -218,55 +218,53 @@ document.querySelectorAll(".wv-swatch").forEach(b => b.classList.remove("active"
   showingFavs = !showingFavs;
   const btn = document.getElementById("favToggle");
   btn.classList.toggle("active", showingFavs);
-
+ 
   if (showingFavs) {
+    // Remove masonry from gallery so labels span full width
+    gallery.classList.remove("wv-masonry");
     gallery.innerHTML = "";
     emptyState.style.display = "none";
     gridTitle.textContent = "Saved & Downloaded";
-
+ 
     const favs    = getFavs();
     const history = getHistory();
-
+ 
     if (!favs.length && !history.length) {
       wallCount.textContent = "";
       emptyState.style.display = "block";
-      emptyState.innerHTML = '<i class="fas fa-heart"></i>Nothing here yet. Save or download wallpapers to see them here.';
+      emptyState.innerHTML = '<i class="fas fa-heart"></i>Nothing here yet.';
       return;
     }
-
+ 
     wallCount.textContent = `${favs.length + history.length} total`;
-
-    // Build HTML outside masonry — use a wrapper div
-    const wrapper = document.createElement("div");
-    wrapper.style.cssText = "display:flex; flex-direction:column; gap:0;";
-
+ 
     if (favs.length) {
       const label = document.createElement("p");
-      label.style.cssText = "font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:1rem;font-weight:600;";
+      label.style.cssText = "font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:1rem;";
       label.textContent = `♥ Favourites · ${favs.length} saved`;
-      wrapper.appendChild(label);
-
+      gallery.appendChild(label);
+ 
       const favGrid = document.createElement("div");
       favGrid.className = "wv-masonry";
       favs.forEach(item => favGrid.appendChild(makeCard(item)));
-      wrapper.appendChild(favGrid);
+      gallery.appendChild(favGrid);
     }
-
+ 
     if (history.length) {
       const histLabel = document.createElement("div");
       histLabel.style.cssText = "display:flex;justify-content:space-between;align-items:center;font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin:2rem 0 1rem;";
       histLabel.innerHTML = `<span>↓ Recently Downloaded · ${history.length}</span><button class="wv-clear-history" onclick="clearHistory()">Clear</button>`;
-      wrapper.appendChild(histLabel);
-
+      gallery.appendChild(histLabel);
+ 
       const histGrid = document.createElement("div");
       histGrid.className = "wv-masonry";
       history.forEach(item => histGrid.appendChild(makeCard(item)));
-      wrapper.appendChild(histGrid);
+      gallery.appendChild(histGrid);
     }
-
-    gallery.appendChild(wrapper);
-
+ 
   } else {
+    // Restore masonry and reload grid
+    gallery.classList.add("wv-masonry");
     resetGallery(currentQuery, currentQuery);
   }
 }
@@ -510,6 +508,7 @@ function renderHistory() {
 function clearHistory() {
   localStorage.removeItem("wv_history");
   showingFavs = false;
+  gallery.classList.add("wv-masonry");
   toggleFavView();
 }
 </script>
