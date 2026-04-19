@@ -405,3 +405,12 @@ select option { background: var(--card); }
   border-color: rgba(0,229,160,0.5);
 }
 .sn-format-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+/* ── COUNTER ── */
+.sn-counter {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.68rem; color: var(--muted);
+  font-family: var(--font-mono);
+  padding: 0.4rem 0.1rem;
+  transition: color 0.2s;
+}
+.sn-counter-dot { opacity: 0.4; }
