@@ -345,3 +345,11 @@ a { text-decoration: none; color: inherit; }
   border-color: white;
   transform: scale(1.25);
 }
+
+/* ── DOWNLOAD HISTORY ── */
+.wv-clear-history {
+  font-size: 0.72rem; color: var(--muted);
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-body); transition: color 0.15s;
+}
+.wv-clear-history:hover { color: var(--text); }
