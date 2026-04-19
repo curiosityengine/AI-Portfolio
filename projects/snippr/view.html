@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
   <link rel="stylesheet" href="snippr.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
 
@@ -204,13 +205,16 @@
 
   // ── QR Code ───────────────────────────────
   function generateQR(url) {
-    const canvas = document.getElementById("qrCanvas");
-    QRCode.toCanvas(canvas, url, {
-      width: 140,
-      margin: 1,
-      color: { dark: "#ffffff", light: "#0a0a0a" }
-    });
-  }
+  new QRious({
+    element: document.getElementById("qrCanvas"),
+    value: url,
+    size: 140,
+    backgroundAlpha: 1,
+    background: "#0a0a0a",
+    foreground: "#ffffff",
+    level: "M"
+  });
+}
 
   function downloadQR() {
     const canvas = document.getElementById("qrCanvas");
