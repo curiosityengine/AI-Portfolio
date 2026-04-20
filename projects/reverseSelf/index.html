@@ -89,13 +89,11 @@
         <span class="rs-input-label">Input Language</span>
         <div class="rs-lang-toggle">
           <button class="rs-lang-btn active" id="langEn" onclick="setLang('en-US')">English</button>
-          <button class="rs-lang-btn" id="langHi" onclick="setLang('hi-IN')">हिंदी</button>
         </div>
         <span class="rs-input-label" style="margin-left:auto">Output Language</span>
         <div class="rs-lang-toggle">
           <button class="rs-lang-btn active" id="outEn" onclick="setOutputLang('english')">English</button>
           <button class="rs-lang-btn" id="outHinglish" onclick="setOutputLang('hinglish')">Hinglish</button>
-          <button class="rs-lang-btn" id="outHi" onclick="setOutputLang('hindi')">हिंदी</button>
         </div>
       </div>
       <div style="position:relative;">
@@ -1408,7 +1406,6 @@ function setOutputLang(lang) {
   outputLang = lang;
   document.getElementById("outEn").classList.toggle("active", lang === "english");
   document.getElementById("outHinglish").classList.toggle("active", lang === "hinglish");
-  document.getElementById("outHi").classList.toggle("active", lang === "hindi");
 }
     </script>
     <!-- WHAT IF MODAL -->
