@@ -1144,3 +1144,7 @@ a {
 .rs-mic-btn.listening svg line {
   stroke: #f87171;
 }
+.rs-input-hint {
+  font-size: 0.72rem; color: var(--muted-light);
+  font-family: var(--font-body);
+}
