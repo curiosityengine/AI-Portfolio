@@ -350,7 +350,26 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
               <div class="rs-timeline">
                 ${timelineHTML}
               </div>
-
+<div class="rs-matches-wrap">
+  <div class="rs-timeline-label" style="margin-bottom:1rem;">Historical Figure Match</div>
+  <div class="rs-matches-grid">
+    ${(data.historicalMatches || []).map(m => `
+      <div class="rs-match-card">
+        <div class="rs-match-header">
+          <span class="rs-match-name">${m.name}</span>
+          <span class="rs-match-pct">${m.match}% match</span>
+        </div>
+        <span class="rs-match-era">${m.era}</span>
+        <p class="rs-match-reason">${m.reason}</p>
+        <div class="rs-match-bar-wrap">
+          <div class="rs-match-bar">
+            <div class="rs-match-fill" style="width:${m.match}%"></div>
+          </div>
+        </div>
+      </div>
+    `).join("")}
+  </div>
+</div>
               <div class="rs-scores-wrap">
                 <div class="rs-timeline-label" style="margin-bottom:1rem;">Persona Score Card</div>
                 <div class="rs-radar-wrap">
