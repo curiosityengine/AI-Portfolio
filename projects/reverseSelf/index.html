@@ -114,6 +114,7 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
 
 <script>
   const WORKER_URL = "https://snapcalc.princemishra11.workers.dev";
+  const personaStore = {};
   let compareMode = false;
 
   // ── Char counters ─────────────────────────
@@ -161,6 +162,7 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
     showLoader("Reverse-engineering your past...");
     try {
       const data = await fetchPersona(traits, name);
+      personaStore[data.personaName] = data; // ← add this line
       document.getElementById("loader").style.display        = "none";
       document.getElementById("resultSingle").style.display  = "block";
       document.getElementById("resultSingleInner").innerHTML = renderPersonaCard(data, false);
@@ -185,6 +187,8 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
         fetchPersona(traitsA, nameA),
         fetchPersona(traitsB, nameB),
       ]);
+      personaStore[dataA.personaName] = dataA;
+      personaStore[dataB.personaName] = dataB;
       document.getElementById("loader").style.display         = "none";
       document.getElementById("resultCompare").style.display  = "block";
       document.getElementById("compareGrid").innerHTML =
@@ -244,7 +248,7 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
   <span class="rs-confidence-val">${event.confidence}%</span>
 </div>
 <button class="rs-whatif-btn"
-  onclick="openWhatIf('${event.event.replace(/'/g, "&#39;")}', '${(data.traits||'').replace(/'/g,"&#39;")}', this)">
+  onclick="openWhatIf('${event.event.replace(/'/g,"&#39;").replace(/"/g,"&quot;")}', '${data.personaName}')">
   ✦ What If?
 </button>
           </div>
@@ -364,9 +368,9 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
 let currentWhatIfEvent  = "";
 let currentWhatIfTraits = "";
 
-function openWhatIf(event, traits, btn) {
+function openWhatIf(event, personaName) {
   currentWhatIfEvent  = event;
-  currentWhatIfTraits = traits;
+  currentWhatIfTraits = personaStore[personaName]?.traits || "";
   document.getElementById("whatIfEventLabel").textContent = `Event: "${event}"`;
   document.getElementById("whatIfInput").value = "";
   document.getElementById("whatIfResult").style.display = "none";
