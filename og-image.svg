@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(108,99,255,0.06)" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="glow" cx="30%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="rgba(108,99,255,0.12)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#0f1226"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect x="0" y="0" width="5" height="630" fill="#6c63ff"/>
+  <rect x="80" y="80" width="200" height="32" rx="16" fill="rgba(108,99,255,0.15)" stroke="rgba(108,99,255,0.3)" stroke-width="1"/>
+  <text x="180" y="101" fill="#6c63ff" font-family="sans-serif" font-size="13" text-anchor="middle" letter-spacing="2">AI PORTFOLIO</text>
+  <text x="80" y="200" fill="#ffffff" font-family="sans-serif" font-size="72" font-weight="800" letter-spacing="-2">Prince</text>
+  <text x="80" y="285" fill="#6c63ff" font-family="sans-serif" font-size="72" font-weight="800" font-style="italic" letter-spacing="-2">AI</text>
+  <text x="80" y="345" fill="#8888aa" font-family="sans-serif" font-size="22">Building AI-powered apps for the general public.</text>
+  <text x="80" y="378" fill="#8888aa" font-family="sans-serif" font-size="22">Free. Fast. Useful.</text>
+  <line x1="80" y1="420" x2="560" y2="420" stroke="rgba(108,99,255,0.25)" stroke-width="1"/>
+  <rect x="80" y="445" width="110" height="30" rx="15" fill="rgba(108,99,255,0.1)" stroke="rgba(108,99,255,0.2)" stroke-width="1"/>
+  <text x="135" y="465" fill="#6c63ff" font-family="sans-serif" font-size="13" text-anchor="middle">SnapCalc</text>
+  <rect x="205" y="445" width="100" height="30" rx="15" fill="rgba(108,99,255,0.1)" stroke="rgba(108,99,255,0.2)" stroke-width="1"/>
+  <text x="255" y="465" fill="#6c63ff" font-family="sans-serif" font-size="13" text-anchor="middle">ToolVerse</text>
+  <rect x="320" y="445" width="85" height="30" rx="15" fill="rgba(108,99,255,0.1)" stroke="rgba(108,99,255,0.2)" stroke-width="1"/>
+  <text x="362" y="465" fill="#6c63ff" font-family="sans-serif" font-size="13" text-anchor="middle">Snippr</text>
+  <rect x="420" y="445" width="100" height="30" rx="15" fill="rgba(108,99,255,0.1)" stroke="rgba(108,99,255,0.2)" stroke-width="1"/>
+  <text x="470" y="465" fill="#6c63ff" font-family="sans-serif" font-size="13" text-anchor="middle">WallVerse</text>
+  <rect x="80" y="490" width="90" height="30" rx="15" fill="rgba(108,99,255,0.1)" stroke="rgba(108,99,255,0.2)" stroke-width="1"/>
+  <text x="125" y="510" fill="#6c63ff" font-family="sans-serif" font-size="13" text-anchor="middle">Briefr</text>
+  <rect x="185" y="490" width="95" height="30" rx="15" fill="rgba(108,99,255,0.1)" stroke="rgba(108,99,255,0.2)" stroke-width="1"/>
+  <text x="232" y="510" fill="#6c63ff" font-family="sans-serif" font-size="13" text-anchor="middle">Summify</text>
+  <rect x="295" y="490" width="115" height="30" rx="15" fill="rgba(108,99,255,0.1)" stroke="rgba(108,99,255,0.2)" stroke-width="1"/>
+  <text x="352" y="510" fill="#6c63ff" font-family="sans-serif" font-size="13" text-anchor="middle">ReverseSelf</text>
+  <circle cx="950" cy="315" r="200" fill="none" stroke="rgba(108,99,255,0.08)" stroke-width="1"/>
+  <circle cx="950" cy="315" r="150" fill="none" stroke="rgba(108,99,255,0.06)" stroke-width="1"/>
+  <circle cx="950" cy="315" r="100" fill="none" stroke="rgba(108,99,255,0.1)" stroke-width="1"/>
+  <circle cx="950" cy="315" r="50" fill="rgba(108,99,255,0.08)"/>
+  <text x="950" y="308" fill="#6c63ff" font-family="sans-serif" font-size="28" font-weight="800" text-anchor="middle">8</text>
+  <text x="950" y="333" fill="#8888aa" font-family="sans-serif" font-size="13" text-anchor="middle">PROJECTS</text>
+  <text x="80" y="590" fill="rgba(108,99,255,0.6)" font-family="sans-serif" font-size="16">princeai.eu.cc</text>
+</svg>
