@@ -261,6 +261,17 @@
     const topicsRow = document.getElementById("topicsRow");
     topicsRow.innerHTML = data.topics?.map(t => `<span class="sm-topic">${t}</span>`).join("") || "";
 
+    // Show metadata notice if no transcript
+const existingNotice = document.getElementById("metaNotice");
+if (existingNotice) existingNotice.remove();
+if (data.sourceNote === "metadata") {
+  const notice = document.createElement("div");
+  notice.id = "metaNotice";
+  notice.style.cssText = "font-size:0.72rem;color:var(--muted);padding:0.5rem 0.75rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;";
+  notice.textContent = "⚠ No transcript found — summary based on video title and description.";
+  document.getElementById("result").insertBefore(notice, document.getElementById("topicsRow"));
+}
+
     // Summary
     document.getElementById("summaryText").textContent = data.summary;
 
