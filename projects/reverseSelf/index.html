@@ -1311,12 +1311,18 @@ function toggleVoiceInput(textareaId, btnId, counterId) {
   }
 
   const btn = document.getElementById(btnId);
+  const micSVG = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="5" y="1" width="6" height="9" rx="3" stroke="#38bdf8" stroke-width="1.5"/>
+  <path d="M3 8.5C3 11.261 5.239 13.5 8 13.5C10.761 13.5 13 11.261 13 8.5" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <line x1="8" y1="13.5" x2="8" y2="15.5" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="5.5" y1="15.5" x2="10.5" y2="15.5" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/>
+</svg>`;
 
   // If already listening — stop
   if (activeRecognition) {
     activeRecognition.stop();
     activeRecognition = null;
-    btn.textContent = "🎤";
+    btn.innerHTML = micSVG;
     btn.classList.remove("listening");
     return;
   }
@@ -1351,16 +1357,15 @@ function toggleVoiceInput(textareaId, btnId, counterId) {
       counter.style.color = textarea.value.length > 450 ? "var(--accent)" : "var(--muted)";
     }
   };
-
   recognition.onerror = (e) => {
     if (e.error !== "aborted") alert("Mic error: " + e.error);
-    btn.textContent = "🎤";
+    btn.innerHTML = micSVG;
     btn.classList.remove("listening");
     activeRecognition = null;
   };
 
   recognition.onend = () => {
-    btn.textContent = "🎤";
+    btn.innerHTML = micSVG;
     btn.classList.remove("listening");
     activeRecognition = null;
   };
