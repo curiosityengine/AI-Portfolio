@@ -185,10 +185,10 @@
 
         <div class="contact-info-card">
           <div class="contact-info-label">Reach me at</div>
-          <a href="gmail.com" class="contact-link">
-            <i class="fas fa-envelope"></i> Mail
+          <a href="mailto:hello@princeai.eu.cc" class="contact-link">
+            <i class="fas fa-envelope"></i> hello@princeai.eu.cc
           </a>
-          <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="contact-link">
+          <a href="https://github.com/curiosityengine" target="_blank" rel="noopener noreferrer" class="contact-link">
             <i class="fab fa-github"></i> GitHub
           </a>
           <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" class="contact-link">
@@ -222,11 +222,9 @@
       const message = document.getElementById("messageInput").value.trim();
       if (!name || !email || !message) return;
 
-      // Opens mailto with pre-filled content as fallback
-      const mailto = `mailto:pm9137@gmail.com?subject=Message from ${encodeURIComponent(name)}&body=${encodeURIComponent(message + "\n\nFrom: " + email)}`;
+      const mailto = `mailto:hello@princeai.eu.cc?subject=Message from ${encodeURIComponent(name)}&body=${encodeURIComponent(message + "\n\nFrom: " + email)}`;
       window.location.href = mailto;
 
-      // Show success state
       document.getElementById("contactForm").style.display = "none";
       document.getElementById("contactSuccess").style.display = "block";
     }
