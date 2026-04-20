@@ -84,14 +84,16 @@
             <span class="rs-input-label">Your Current Traits</span>
             <span class="rs-char-count" id="charCount1">0 / 500</span>
           </div>
-          <textarea
-            class="rs-textarea"
-            id="traits1"
-            maxlength="500"
+          <div style="position:relative;">
+          <textarea class="rs-textarea" id="traits1" maxlength="500"
             placeholder="Describe yourself honestly — your personality, skills, habits, fears, values, how you handle stress, what drives you, your quirks...
 
 e.g. I'm introverted but can switch to social mode when needed. I overthink everything. I'm great at starting projects but struggle to finish them. I have a deep fear of failure but also fear of mediocrity. I work better at night. I'm drawn to creative work but ended up in a technical career..."
           ></textarea>
+            <button class="rs-mic-btn" id="micBtn1" onclick="toggleVoiceInput('traits1', 'micBtn1', 'charCount1')" title="Speak your traits">
+    🎤
+  </button>
+</div>
           <div class="rs-input-footer">
             <input
               type="text"
