@@ -329,6 +329,12 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
                   <div class="rs-archetype">${data.archetype}</div>
                 </div>
               </div>
+              <div class="rs-voice-row">
+  <button class="rs-voice-btn" id="voice-${safeId}" onclick="toggleVoice('${safeId}')">
+    ▶ Read Aloud
+  </button>
+  <span class="rs-voice-label" id="voiceLabel-${safeId}"></span>
+</div>
 
               <p class="rs-summary">${data.summary}</p>
 
