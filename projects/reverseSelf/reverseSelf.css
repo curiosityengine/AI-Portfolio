@@ -579,3 +579,24 @@ a { text-decoration: none; color: inherit; }
   text-align: center; padding: 3rem 1rem;
   color: var(--muted); font-size: 0.8rem; font-family: var(--font-mono);
 }
+/* ── VOICE ── */
+.rs-voice-row {
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.rs-voice-btn {
+  font-size: 0.72rem; color: var(--accent);
+  padding: 0.35rem 0.85rem;
+  border: 1px solid rgba(0,212,255,0.25);
+  border-radius: 6px; background: var(--accent-dim);
+  cursor: pointer; font-family: var(--font-mono);
+  transition: all 0.15s; letter-spacing: 0.05em;
+}
+.rs-voice-btn:hover { background: var(--accent-glow); border-color: rgba(0,212,255,0.5); }
+.rs-voice-btn.speaking {
+  background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.3);
+  color: #f87171;
+}
+.rs-voice-label {
+  font-size: 0.65rem; color: var(--muted);
+  font-family: var(--font-mono);
+}
