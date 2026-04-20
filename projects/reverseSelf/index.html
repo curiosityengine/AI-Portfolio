@@ -171,6 +171,27 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
   </div><!-- ✅ closes rs-compare-mode -->
 
 </div><!-- ✅ closes rs-input-section -->
+    <!-- LOADER -->
+<div class="rs-loader" id="loader" style="display:none">
+  <div class="rs-loader-ring"></div>
+  <p class="rs-loader-text" id="loaderText">Reverse-engineering your past...</p>
+</div>
+
+<!-- RESULT — SINGLE -->
+<div class="rs-result" id="resultSingle" style="display:none">
+  <div class="rs-result-inner" id="resultSingleInner"></div>
+  <div style="text-align:center; margin-top:2.5rem;">
+    <button class="rs-reset-btn" onclick="resetApp()">← Analyze Another</button>
+  </div>
+</div>
+
+<!-- RESULT — COMPARE -->
+<div class="rs-result rs-compare-result" id="resultCompare" style="display:none">
+  <div class="rs-compare-grid" id="compareGrid"></div>
+  <div style="text-align:center; margin-top:2.5rem;">
+    <button class="rs-reset-btn" onclick="resetApp()">← Start Over</button>
+  </div>
+</div>
 
     <footer class="rs-footer">
       © 2026 ReverseSelf · Built by Prince · AI-generated — for exploration
