@@ -1154,3 +1154,42 @@ a {
   font-family: var(--font-mono); font-weight: 600;
   white-space: nowrap;
 }
+/* ── LANGUAGE ROW ── */
+.rs-lang-row {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 0.75rem; flex-wrap: nowrap;
+}
+.rs-lang-group {
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.rs-lang-group-label {
+  font-size: 0.62rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.14em;
+  font-family: var(--font-mono); font-weight: 600;
+  white-space: nowrap;
+}
+.rs-lang-static {
+  font-size: 0.72rem; color: var(--muted-light);
+  font-family: var(--font-body);
+}
+.rs-lang-divider {
+  width: 1px; height: 16px;
+  background: var(--border); flex-shrink: 0;
+}
+.rs-lang-toggle {
+  display: flex; gap: 0.3rem;
+}
+.rs-lang-btn {
+  font-size: 0.72rem; padding: 0.25rem 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px; color: var(--muted-light);
+  cursor: pointer; font-family: var(--font-body);
+  transition: all 0.15s; line-height: 1.4;
+}
+.rs-lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+.rs-lang-btn.active {
+  background: var(--accent-dim);
+  border-color: rgba(56,189,248,0.4);
+  color: var(--accent);
+}
