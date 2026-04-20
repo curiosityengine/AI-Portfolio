@@ -115,12 +115,17 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
             <span class="rs-input-label">Persona A</span>
             <span class="rs-char-count" id="charCountA">0 / 500</span>
           </div>
+          <div style="position:relative;">
           <textarea
             class="rs-textarea"
             id="traitsA"
             maxlength="500"
             placeholder="Describe Persona A's traits..."
           ></textarea>
+            <button class="rs-mic-btn" id="micBtnA" onclick="toggleVoiceInput('traitsA', 'micBtnA', 'charCountA')" title="Speak traits">
+    🎤
+  </button>
+</div>
           <div class="rs-input-footer">
             <input
               type="text"
@@ -135,12 +140,17 @@ e.g. I'm introverted but can switch to social mode when needed. I overthink ever
             <span class="rs-input-label">Persona B</span>
             <span class="rs-char-count" id="charCountB">0 / 500</span>
           </div>
+          <div style="position:relative;">
           <textarea
             class="rs-textarea"
             id="traitsB"
             maxlength="500"
             placeholder="Describe Persona B's traits..."
           ></textarea>
+            <button class="rs-mic-btn" id="micBtnB" onclick="toggleVoiceInput('traitsB', 'micBtnB', 'charCountB')" title="Speak traits">
+    🎤
+  </button>
+</div>
           <div class="rs-input-footer">
             <input
               type="text"
@@ -1320,6 +1330,72 @@ async function downloadPDF(personaName) {
   doc.save(filename);
 
   if (btn) { btn.textContent = "↓ Download PDF Report"; btn.disabled = false; }
+}
+      // ── Voice Input ───────────────────────────
+let activeRecognition = null;
+
+function toggleVoiceInput(textareaId, btnId, counterId) {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert("Voice input is not supported in this browser. Try Chrome.");
+    return;
+  }
+
+  const btn = document.getElementById(btnId);
+
+  // If already listening — stop
+  if (activeRecognition) {
+    activeRecognition.stop();
+    activeRecognition = null;
+    btn.textContent = "🎤";
+    btn.classList.remove("listening");
+    return;
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+  activeRecognition = recognition;
+
+  recognition.continuous     = true;
+  recognition.interimResults = true;
+  recognition.lang           = "en-US";
+
+  const textarea = document.getElementById(textareaId);
+  const counter  = document.getElementById(counterId);
+  const existing = textarea.value;
+
+  btn.textContent = "⏹";
+  btn.classList.add("listening");
+
+  recognition.onresult = (e) => {
+    let interim = "";
+    let final   = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final   += e.results[i][0].transcript;
+      else                       interim += e.results[i][0].transcript;
+    }
+    const combined = (existing + " " + final).trim();
+    textarea.value = combined + (interim ? " " + interim : "");
+    textarea.value = textarea.value.slice(0, 500);
+    if (counter) {
+      counter.textContent = `${textarea.value.length} / 500`;
+      counter.style.color = textarea.value.length > 450 ? "var(--accent)" : "var(--muted)";
+    }
+  };
+
+  recognition.onerror = (e) => {
+    if (e.error !== "aborted") alert("Mic error: " + e.error);
+    btn.textContent = "🎤";
+    btn.classList.remove("listening");
+    activeRecognition = null;
+  };
+
+  recognition.onend = () => {
+    btn.textContent = "🎤";
+    btn.classList.remove("listening");
+    activeRecognition = null;
+  };
+
+  recognition.start();
 }
     </script>
     <!-- WHAT IF MODAL -->
