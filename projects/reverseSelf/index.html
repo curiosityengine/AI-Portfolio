@@ -810,6 +810,111 @@ function deleteSaved(index) {
 
 // Init saved count on load
 updateSavedCount();
+
+      // ── Persona Voice ─────────────────────────
+let currentUtterance = null;
+let currentVoiceSafeId = null;
+
+function toggleVoice(safeId) {
+  const btn   = document.getElementById(`voice-${safeId}`);
+  const label = document.getElementById(`voiceLabel-${safeId}`);
+
+  // If already speaking this persona — stop
+  if (currentVoiceSafeId === safeId && speechSynthesis.speaking) {
+    speechSynthesis.cancel();
+    btn.textContent = "▶ Read Aloud";
+    btn.classList.remove("speaking");
+    label.textContent = "";
+    currentVoiceSafeId = null;
+    return;
+  }
+
+  // Stop any other ongoing speech
+  if (speechSynthesis.speaking) {
+    speechSynthesis.cancel();
+    if (currentVoiceSafeId) {
+      const oldBtn   = document.getElementById(`voice-${currentVoiceSafeId}`);
+      const oldLabel = document.getElementById(`voiceLabel-${currentVoiceSafeId}`);
+      if (oldBtn)   { oldBtn.textContent = "▶ Read Aloud"; oldBtn.classList.remove("speaking"); }
+      if (oldLabel) oldLabel.textContent = "";
+    }
+  }
+
+  // Find persona data
+  const data = Object.values(personaStore).find(p => {
+    const id = (p.personaName || "persona").replace(/\s+/g,"-").replace(/[^a-zA-Z0-9-]/g,"");
+    return id === safeId;
+  });
+  if (!data) return;
+
+  // Build script
+  const timelineScript = (data.timeline || []).map((e, i) =>
+    `Event ${i + 1}: ${e.event}. Age ${e.age}. ${e.description}`
+  ).join(". ");
+
+  const script = `
+    ${data.personaName}. Archetype: ${data.archetype}.
+    ${data.summary}.
+    Timeline of likely past events.
+    ${timelineScript}.
+    Turning point: ${data.turningPoint}.
+  `.replace(/\s+/g, " ").trim();
+
+  currentUtterance    = new SpeechSynthesisUtterance(script);
+  currentVoiceSafeId  = safeId;
+
+  // Pick a calm voice
+  const voices = speechSynthesis.getVoices();
+  const preferred = voices.find(v =>
+    v.name.includes("Google UK English Female") ||
+    v.name.includes("Samantha") ||
+    v.name.includes("Karen") ||
+    v.name.includes("Moira") ||
+    (v.lang === "en-GB" && v.name.toLowerCase().includes("female"))
+  ) || voices.find(v => v.lang.startsWith("en")) || voices[0];
+
+  if (preferred) currentUtterance.voice = preferred;
+  currentUtterance.rate   = 0.88;
+  currentUtterance.pitch  = 0.95;
+  currentUtterance.volume = 1;
+
+  currentUtterance.onstart = () => {
+    btn.textContent = "■ Stop";
+    btn.classList.add("speaking");
+    label.textContent = "Narrating...";
+  };
+
+  currentUtterance.onend = () => {
+    btn.textContent = "▶ Read Aloud";
+    btn.classList.remove("speaking");
+    label.textContent = "";
+    currentVoiceSafeId = null;
+  };
+
+  currentUtterance.onerror = () => {
+    btn.textContent = "▶ Read Aloud";
+    btn.classList.remove("speaking");
+    label.textContent = "";
+    currentVoiceSafeId = null;
+  };
+
+  // Voices may not be loaded yet
+  if (speechSynthesis.getVoices().length === 0) {
+    speechSynthesis.addEventListener("voiceschanged", () => {
+      speechSynthesis.speak(currentUtterance);
+    }, { once: true });
+  } else {
+    speechSynthesis.speak(currentUtterance);
+  }
+}
+
+// Stop speech on reset
+const _originalReset = resetApp;
+window.resetApp = function() {
+  if (speechSynthesis.speaking) speechSynthesis.cancel();
+  currentVoiceSafeId = null;
+  _originalReset();
+};
     </script>
     <!-- WHAT IF MODAL -->
     <div
