@@ -86,11 +86,17 @@
         <span class="rs-char-count" id="charCount1">0 / 500</span>
       </div>
       <div class="rs-lang-row">
-  <span class="rs-input-hint">. Type or speak in English or Hinglish</span>
-  <span class="rs-input-label">Output</span>
-  <div class="rs-lang-toggle">
-    <button class="rs-lang-btn active" id="outEn" onclick="setOutputLang('english')">English</button>
-    <button class="rs-lang-btn" id="outHinglish" onclick="setOutputLang('hinglish')">Hinglish</button>
+  <div class="rs-lang-group">
+    <span class="rs-lang-group-label">Input</span>
+    <span class="rs-lang-static">English · Hinglish</span>
+  </div>
+  <div class="rs-lang-divider"></div>
+  <div class="rs-lang-group">
+    <span class="rs-lang-group-label">Output</span>
+    <div class="rs-lang-toggle">
+      <button class="rs-lang-btn active" id="outEn" onclick="setOutputLang('english')">English</button>
+      <button class="rs-lang-btn" id="outHinglish" onclick="setOutputLang('hinglish')">Hinglish</button>
+    </div>
   </div>
 </div>
       <div style="position:relative;">
