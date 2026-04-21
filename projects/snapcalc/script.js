@@ -43,8 +43,12 @@ async function calculate(input) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ input: key }),
     });
+
     const data = await res.json();
-    const answer = (data.answer ?? "?").toString().trim();
+
+    // 🔥 CHANGED HERE (important)
+    const answer = (data.result ?? "?").toString().trim();
+
     cacheSet(key, answer);
     setResult(answer, "pop");
   } catch (err) {
