@@ -238,3 +238,22 @@
       .corner { display: none; }
       .subtitle { display: none; }
     }
+/* ── EXAMPLE CHIPS ── */
+.examples-wrap {
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+  justify-content: center; margin-top: 1rem;
+}
+.example-chip {
+  font-size: 0.72rem; padding: 0.3rem 0.75rem;
+  background: transparent; border: 1px solid #222;
+  border-radius: 999px; color: #555;
+  cursor: pointer; font-family: 'DM Mono', monospace;
+  transition: all 0.15s;
+}
+.example-chip:hover { border-color: #d4f700; color: #d4f700; }
+
+/* ── COPIED STATE ── */
+.copied {
+  color: #22c55e !important;
+  font-size: 1rem !important;
+}
