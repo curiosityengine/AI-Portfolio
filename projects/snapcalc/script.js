@@ -22,11 +22,8 @@ function getHistory() {
 function addToHistory(input, answer) {
   if (answer === "?" || answer === "!" || answer === "_") return;
   let history = getHistory();
-  // Remove duplicate
   history = history.filter(h => h.input !== input);
-  // Add to front
   history.unshift({ input, answer, time: Date.now() });
-  // Keep max
   if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
   renderHistory();
@@ -37,10 +34,7 @@ function renderHistory() {
   const list  = document.getElementById("historyList");
   if (!panel || !list) return;
   const history = getHistory();
-  if (history.length === 0) {
-    panel.style.display = "none";
-    return;
-  }
+  if (history.length === 0) { panel.style.display = "none"; return; }
   panel.style.display = "block";
   list.innerHTML = history.map((h, i) => `
     <div class="history-item" onclick="loadHistory(${i})">
@@ -55,6 +49,8 @@ function loadHistory(index) {
   const h = history[index];
   if (!h) return;
   inputBox.value = h.input;
+  currentExplanation = "";
+  hideExplanation();
   setResult(h.answer, "pop");
   showVariations(h.input, h.answer);
   inputBox.focus();
@@ -69,18 +65,14 @@ function clearHistory() {
 function showVariations(input, answer) {
   const wrap = document.getElementById("variationsWrap");
   if (!wrap) return;
-
-  // Only show for numeric answers
-  const num = parseFloat(answer.replace(/,/g, ""));
+  const num = parseFloat(String(answer).replace(/,/g, ""));
   if (isNaN(num)) { wrap.style.display = "none"; return; }
-
   const variations = [
     { label: "+10%", value: num * 1.1 },
     { label: "-10%", value: num * 0.9 },
     { label: "×2",   value: num * 2   },
     { label: "÷2",   value: num / 2   },
   ];
-
   wrap.style.display = "flex";
   wrap.innerHTML = variations.map(v => {
     const formatted = formatNum(v.value);
@@ -90,7 +82,6 @@ function showVariations(input, answer) {
 
 function applyVariation(value, label) {
   setResult(value, "pop");
-  // Flash the active button
   document.querySelectorAll(".var-btn").forEach(b => {
     if (b.textContent === label) {
       b.classList.add("active");
@@ -110,9 +101,28 @@ function hideVariations() {
   if (wrap) wrap.style.display = "none";
 }
 
-// ── Request ID (prevent stale responses) ──
-let currentRequestId = 0;
+// ── Explanation ────────────────────────────
 let currentExplanation = "";
+
+function hideExplanation() {
+  const box = document.getElementById("explanationBox");
+  const btn = document.getElementById("explainBtn");
+  if (box) box.style.display = "none";
+  if (btn) btn.classList.remove("active");
+}
+
+function toggleExplanation() {
+  const box = document.getElementById("explanationBox");
+  const btn = document.getElementById("explainBtn");
+  if (!box || !btn || !currentExplanation) return;
+  const isOpen = box.style.display === "block";
+  box.style.display = isOpen ? "none" : "block";
+  box.textContent   = currentExplanation;
+  btn.classList.toggle("active", !isOpen);
+}
+
+// ── Request ID ─────────────────────────────
+let currentRequestId = 0;
 let debounceTimer    = null;
 
 // ── Input handler ─────────────────────────
@@ -122,12 +132,12 @@ inputBox.addEventListener("input", () => {
   if (!val) {
     setResult("_", "idle");
     hideVariations();
-    hideExplanation(); // ← add this
+    hideExplanation();
     return;
   }
   setResult("·  ·  ·", "loading");
   hideVariations();
-  hideExplanation(); // ← add this
+  hideExplanation();
   debounceTimer = setTimeout(() => calculate(val), 200);
 });
 
@@ -141,6 +151,7 @@ inputBox.addEventListener("keydown", (e) => {
     inputBox.value = "";
     setResult("_", "idle");
     hideVariations();
+    hideExplanation();
   }
 });
 
@@ -148,10 +159,14 @@ inputBox.addEventListener("keydown", (e) => {
 async function calculate(input) {
   const key = input.toLowerCase().trim();
 
+  // Check cache
   if (cache.has(key)) {
     const cached = cache.get(key);
-    setResult(cached, "pop");
-    showVariations(key, cached);
+    const ans = typeof cached === "object" ? cached.answer : cached;
+    const exp = typeof cached === "object" ? cached.explanation : "";
+    currentExplanation = exp;
+    setResult(ans, "pop");
+    showVariations(key, ans);
     return;
   }
 
@@ -168,26 +183,14 @@ async function calculate(input) {
 
     if (requestId !== currentRequestId) return; // stale
 
-    const answer = (data.answer ?? "?").toString().trim();
-currentExplanation = data.explanation || "";
-// In cacheSet — store object
-cacheSet(key, { answer, explanation: currentExplanation });
-// When reading from cache
-if (cache.has(key)) {
-  const cached = cache.get(key);
-  const ans = typeof cached === "object" ? cached.answer : cached;
-  const exp = typeof cached === "object" ? cached.explanation : "";
-  currentExplanation = exp;
-  setResult(ans, "pop");
-  showVariations(key, ans);
-  return;
-}
-setResult(answer, "pop");
-showVariations(key, answer);
-const answer = (data.answer ?? "?").toString().trim();
-addToHistory(input, answer);
-// Hide explanation when new result comes in
-hideExplanation();
+    const answer      = (data.answer ?? "?").toString().trim();
+    currentExplanation = data.explanation || "";
+
+    cacheSet(key, { answer, explanation: currentExplanation });
+    setResult(answer, "pop");
+    showVariations(key, answer);
+    addToHistory(input, answer);
+    hideExplanation();
 
   } catch (err) {
     console.error(err);
@@ -201,23 +204,7 @@ function setResult(value, state) {
   resultDiv.className = state;
   resultDiv.textContent = value;
 }
-function hideExplanation() {
-  const box = document.getElementById("explanationBox");
-  const btn = document.getElementById("explainBtn");
-  if (box) box.style.display = "none";
-  if (btn) btn.classList.remove("active");
-}
 
-function toggleExplanation() {
-  const box = document.getElementById("explanationBox");
-  const btn = document.getElementById("explainBtn");
-  if (!box || !btn) return;
-  if (!currentExplanation) return;
-  const isOpen = box.style.display === "block";
-  box.style.display = isOpen ? "none" : "block";
-  box.textContent   = currentExplanation;
-  btn.classList.toggle("active", !isOpen);
-}
 // ── Click to copy ─────────────────────────
 resultDiv.addEventListener("click", () => {
   const val = resultDiv.textContent;
