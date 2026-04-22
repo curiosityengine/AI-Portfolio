@@ -257,3 +257,35 @@
   color: #22c55e !important;
   font-size: 1rem !important;
 }
+/* ── EXPLAIN ── */
+.explain-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  color: #333;
+  background: none;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: color 0.15s;
+  padding: 0;
+}
+.explain-btn:hover { color: #d4f700; }
+.explain-btn.active { color: #d4f700; }
+
+.explanation-box {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: #555;
+  line-height: 1.8;
+  text-align: left;
+  background: #0d0d0d;
+  border: 1px solid #1a1a1a;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-top: 0.5rem;
+  white-space: pre-wrap;
+  max-width: 480px;
+  width: 100%;
+}
+.explanation-box .highlight { color: #d4f700; }
