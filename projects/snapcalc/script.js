@@ -186,7 +186,9 @@ async function calculate(input) {
     const answer      = (data.answer ?? "?").toString().trim();
     currentExplanation = data.explanation || "";
 
-    cacheSet(key, { answer, explanation: currentExplanation });
+    if (answer !== "?" && answer !== "!" && answer !== "_") {
+  cacheSet(key, { answer, explanation: currentExplanation });
+}
     setResult(answer, "pop");
     showVariations(key, answer);
     addToHistory(input, answer);
