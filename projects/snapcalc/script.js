@@ -182,6 +182,7 @@ if (cache.has(key)) {
 }
 setResult(answer, "pop");
 showVariations(key, answer);
+const answer = (data.answer ?? "?").toString().trim();
 addToHistory(input, answer);
 // Hide explanation when new result comes in
 hideExplanation();
