@@ -234,12 +234,17 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query, category: activeCategory }),
       });
-      const data = await res.json();
-
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        showSummaryError(`Server returned non-JSON (HTTP ${res.status}). The /api/briefr/summarize route may not be deployed yet.`);
+        return;
+      }
       hideLoader();
 
       if (!data.articles || data.articles.length === 0) {
-        document.getElementById("emptyState").style.display = "flex";
+        showSummaryError(data?.error || "Unknown error from server.");
         return;
       }
 
@@ -247,7 +252,7 @@
 
     } catch (err) {
       hideLoader();
-      document.getElementById("emptyState").style.display = "flex";
+      showSummaryError(`Network error: ${err.message}`);
     }
   }
 
@@ -447,7 +452,11 @@ ${data.myTake ? `
   function hideLoader() {
     document.getElementById("loader").style.display = "none";
   }
-
+function showSummaryError(msg) {
+    hideLoader();
+    document.getElementById("summaryErrorMsg").textContent = msg;
+    document.getElementById("summaryEmptyState").style.display = "flex";
+  }
   function hideAll() {
     document.getElementById("loader").style.display = "none";
     document.getElementById("resultsMain").style.display = "none";
