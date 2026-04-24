@@ -471,3 +471,12 @@ a { text-decoration: none; color: inherit; }
   transition: color 0.15s;
 }
 .br-sum-link:hover { color: var(--accent); }
+.br-my-take {
+  background: rgba(79,142,255,0.05);
+  border: 1px solid rgba(79,142,255,0.18);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+.br-my-take .br-sum-label {
+  color: var(--accent);
+}
