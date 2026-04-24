@@ -13,7 +13,7 @@
 <meta name="description" content="Briefr shows news from across the political spectrum. Search any news event and see articles categorized by political lean — Left, Center, Right — with credibility ratings.">
 <meta name="keywords" content="news political bias checker, media bias analyzer, news across political spectrum, AI news analysis, news credibility checker, unbiased news">
 <link rel="canonical" href="https://princeai.eu.cc/projects/briefr/">
- 
+
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://princeai.eu.cc/projects/briefr/">
 <meta property="og:title" content="Briefr — See News Through Every Lens">
@@ -23,7 +23,7 @@
 <meta name="twitter:title" content="Briefr — See News Through Every Lens">
 <meta name="twitter:description" content="Search any news event. See coverage from Left, Center, and Right sources with credibility ratings.">
 <meta name="twitter:image" content="https://princeai.eu.cc/og-image.svg">
- 
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -41,10 +41,14 @@
 
 <nav class="br-nav">
   <a href="index.html" class="br-logo">Bri<span>efr</span></a>
-  <span class="br-tagline">News through every lens</span>
+  <div class="br-mode-toggle">
+    <button class="br-mode-btn active" id="modeCrawler" onclick="switchMode('crawler')">Crawler</button>
+    <button class="br-mode-btn" id="modeSummarizer" onclick="switchMode('summarizer')">Summarizer</button>
+  </div>
 </nav>
 
-<section class="br-hero">
+<!-- CRAWLER HERO -->
+<section class="br-hero" id="heroSearch">
   <div class="br-hero-badge">AI-Powered News Analysis</div>
   <h1>See the full<br><em>picture</em></h1>
   <p class="br-hero-sub">Search any news event. Get top articles categorized by political lean, credibility, and source — all in one place.</p>
@@ -71,7 +75,24 @@
   </div>
 </section>
 
-<!-- RESULTS -->
+<!-- SUMMARIZER HERO -->
+<section class="br-hero" id="heroSummarize" style="display:none">
+  <div class="br-hero-badge">AI Article Summarizer</div>
+  <h1>Decode any<br><em>article</em></h1>
+  <p class="br-hero-sub">Paste any article URL. Get an AI-powered summary, key takeaways, political lean analysis, and credibility rating — instantly.</p>
+
+  <div class="br-search-wrap">
+    <div class="br-search-box">
+      <i class="br-search-icon">⌕</i>
+      <input type="url" id="urlInput" class="br-search-input"
+        placeholder="Paste an article URL — e.g. https://bbc.com/news/...">
+      <button class="br-search-btn" id="summarizeBtn" onclick="summarizeArticle()">Summarize →</button>
+    </div>
+    <p class="br-url-hint">Works with most major news sites · No paywall bypass</p>
+  </div>
+</section>
+
+<!-- CRAWLER RESULTS -->
 <main class="br-main" id="resultsMain" style="display:none">
 
   <div class="br-results-header">
@@ -82,7 +103,7 @@
     <button class="br-new-search" onclick="resetSearch()">← New Search</button>
   </div>
 
-  <!-- POLITICAL LEAN LEGEND (shown only for politics) -->
+  <!-- POLITICAL LEAN LEGEND -->
   <div class="br-lean-legend" id="leanLegend" style="display:none">
     <span class="br-legend-item">
       <span class="br-lean-dot left"></span> Left
@@ -105,6 +126,21 @@
 
 </main>
 
+<!-- SUMMARIZER RESULTS -->
+<main class="br-main br-summary-main" id="summaryMain" style="display:none">
+
+  <div class="br-results-header">
+    <div>
+      <h2 class="br-results-title" id="summaryTitle"></h2>
+      <p class="br-results-sub" id="summarySub"></p>
+    </div>
+    <button class="br-new-search" onclick="resetSearch()">← New Search</button>
+  </div>
+
+  <div id="summaryCard"></div>
+
+</main>
+
 <!-- LOADER -->
 <div class="br-loader" id="loader" style="display:none">
   <div class="br-loader-inner">
@@ -113,7 +149,7 @@
       <div class="br-dot"></div>
       <div class="br-dot"></div>
     </div>
-    <p class="br-loader-text">Fetching articles and analysing sources...</p>
+    <p class="br-loader-text" id="loaderText">Fetching articles and analysing sources...</p>
   </div>
 </div>
 
@@ -142,6 +178,14 @@
   <button class="br-new-search" style="margin-top:1.5rem;" onclick="resetSearch()">← Try a new search</button>
 </div>
 
+<!-- SUMMARIZER EMPTY STATE -->
+<div class="br-empty" id="summaryEmptyState" style="display:none">
+  <div class="br-empty-icon">◎</div>
+  <h3 class="br-empty-title">Couldn't summarize this article</h3>
+  <p class="br-empty-sub">This could be due to a paywall, an invalid URL, or a site that blocks scraping. Try a different article.</p>
+  <button class="br-new-search" style="margin-top:1.5rem;" onclick="resetSearch()">← Try another URL</button>
+</div>
+
 <footer class="br-footer">
   © 2026 Briefr · Built by Prince · Powered by NewsAPI & Groq
   <span class="br-footer-note">Political lean is based on source, not individual article content.</span>
@@ -150,6 +194,20 @@
 <script>
   const WORKER_URL = "https://snapcalc.princemishra11.workers.dev";
   let activeCategory = "general";
+  let activeMode = "crawler";
+
+  // ── Mode toggle ───────────────────────────
+  function switchMode(mode) {
+    if (mode === activeMode) return;
+    activeMode = mode;
+
+    document.getElementById("modeCrawler").classList.toggle("active", mode === "crawler");
+    document.getElementById("modeSummarizer").classList.toggle("active", mode === "summarizer");
+
+    // Reset to hero state whenever mode changes
+    hideAll();
+    document.getElementById(mode === "crawler" ? "heroSearch" : "heroSummarize").style.display = "block";
+  }
 
   // ── Category buttons ──────────────────────
   document.querySelectorAll(".br-cat").forEach(btn => {
@@ -160,7 +218,7 @@
     });
   });
 
-  // ── Search ────────────────────────────────
+  // ── Crawler: search ───────────────────────
   async function searchNews() {
     const query = document.getElementById("searchInput").value.trim();
     if (!query) {
@@ -168,11 +226,7 @@
       return;
     }
 
-    // Show loader
-    document.getElementById("loader").style.display = "flex";
-    document.getElementById("resultsMain").style.display = "none";
-    document.getElementById("emptyState").style.display = "none";
-    document.querySelector(".br-hero").style.display = "none";
+    showLoader("Fetching articles and analysing sources...");
 
     try {
       const res  = await fetch(`${WORKER_URL}/api/briefr`, {
@@ -182,7 +236,7 @@
       });
       const data = await res.json();
 
-      document.getElementById("loader").style.display = "none";
+      hideLoader();
 
       if (!data.articles || data.articles.length === 0) {
         document.getElementById("emptyState").style.display = "flex";
@@ -192,12 +246,52 @@
       renderArticles(data.articles, query);
 
     } catch (err) {
-      document.getElementById("loader").style.display = "none";
+      hideLoader();
       document.getElementById("emptyState").style.display = "flex";
     }
   }
 
-  // ── Render articles ───────────────────────
+  // ── Summarizer: summarize ─────────────────
+  async function summarizeArticle() {
+    const url = document.getElementById("urlInput").value.trim();
+    if (!url) {
+      document.getElementById("urlInput").focus();
+      return;
+    }
+
+    // Basic URL validation
+    try { new URL(url); } catch {
+      document.getElementById("urlInput").style.borderColor = "rgba(239,68,68,0.5)";
+      setTimeout(() => document.getElementById("urlInput").style.borderColor = "", 1500);
+      return;
+    }
+
+    showLoader("Fetching article and generating summary...");
+
+    try {
+      const res  = await fetch(`${WORKER_URL}/api/briefr/summarize`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+
+      hideLoader();
+
+      if (!data || data.error) {
+        document.getElementById("summaryEmptyState").style.display = "flex";
+        return;
+      }
+
+      renderSummary(data, url);
+
+    } catch (err) {
+      hideLoader();
+      document.getElementById("summaryEmptyState").style.display = "flex";
+    }
+  }
+
+  // ── Render: articles (crawler) ────────────
   function renderArticles(articles, query) {
     const isPolitical = articles[0]?.isPolitical;
 
@@ -235,6 +329,69 @@
     document.getElementById("resultsMain").style.display = "block";
   }
 
+  // ── Render: summary card ──────────────────
+  function renderSummary(data, originalUrl) {
+    const lean     = data.lean     || "Center";
+    const cred     = data.credibility || "Medium";
+    const sentiment = data.sentiment || "Neutral";
+    const topics   = Array.isArray(data.topics) ? data.topics : [];
+    const keyPoints = Array.isArray(data.keyPoints) ? data.keyPoints : [];
+
+    document.getElementById("summaryTitle").textContent = data.title
+      ? escHtml(data.title.length > 70 ? data.title.slice(0, 70) + "…" : data.title)
+      : "Article Summary";
+    document.getElementById("summarySub").textContent =
+      `${data.source || "Unknown source"} · ${data.readTime || ""} · Summarised by Groq`.replace(/· $/, "");
+
+    const sentimentCls = sentiment === "Positive" ? "sentiment-pos"
+                       : sentiment === "Negative" ? "sentiment-neg"
+                       : "sentiment-neu";
+
+    const keyPointsHtml = keyPoints.length
+      ? `<ul class="br-kp-list">${keyPoints.map(p => `<li>${escHtml(p)}</li>`).join("")}</ul>`
+      : "";
+
+    const topicsHtml = topics.length
+      ? `<div class="br-topics">${topics.map(t => `<span class="br-topic-chip">${escHtml(t)}</span>`).join("")}</div>`
+      : "";
+
+    document.getElementById("summaryCard").innerHTML = `
+      <div class="br-sum-card">
+        <div class="br-sum-badges">
+          ${leanBadge(lean)}
+          ${credBadge(cred)}
+          <span class="br-sentiment-badge ${sentimentCls}">${escHtml(sentiment)}</span>
+          ${data.readTime ? `<span class="br-readtime-badge">⏱ ${escHtml(data.readTime)}</span>` : ""}
+        </div>
+
+        ${data.summary ? `
+        <div class="br-sum-section">
+          <p class="br-sum-label">Summary</p>
+          <p class="br-sum-text">${escHtml(data.summary)}</p>
+        </div>` : ""}
+
+        ${keyPoints.length ? `
+        <div class="br-sum-section">
+          <p class="br-sum-label">Key Takeaways</p>
+          ${keyPointsHtml}
+        </div>` : ""}
+
+        ${topics.length ? `
+        <div class="br-sum-section">
+          <p class="br-sum-label">Topics</p>
+          ${topicsHtml}
+        </div>` : ""}
+
+        <div class="br-sum-footer">
+          <span class="br-sum-source">${escHtml(data.source || "")}</span>
+          <a href="${originalUrl}" target="_blank" rel="noopener noreferrer" class="br-sum-link">Read full article →</a>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("summaryMain").style.display = "block";
+  }
+
   // ── Badge helpers ─────────────────────────
   function leanBadge(lean) {
     const map = {
@@ -270,23 +427,57 @@
     return `${Math.floor(diff / 86400)}d ago`;
   }
 
-  function resetSearch() {
+  function showLoader(text) {
+    document.getElementById("loaderText").textContent = text;
+    document.getElementById("loader").style.display = "flex";
     document.getElementById("resultsMain").style.display = "none";
+    document.getElementById("summaryMain").style.display = "none";
     document.getElementById("emptyState").style.display = "none";
-    document.querySelector(".br-hero").style.display = "block";
-    document.getElementById("searchInput").value = "";
-    document.getElementById("searchInput").focus();
+    document.getElementById("summaryEmptyState").style.display = "none";
+    document.getElementById("heroSearch").style.display = "none";
+    document.getElementById("heroSummarize").style.display = "none";
   }
 
-  // ── Keyboard shortcut ─────────────────────
+  function hideLoader() {
+    document.getElementById("loader").style.display = "none";
+  }
+
+  function hideAll() {
+    document.getElementById("loader").style.display = "none";
+    document.getElementById("resultsMain").style.display = "none";
+    document.getElementById("summaryMain").style.display = "none";
+    document.getElementById("emptyState").style.display = "none";
+    document.getElementById("summaryEmptyState").style.display = "none";
+    document.getElementById("heroSearch").style.display = "none";
+    document.getElementById("heroSummarize").style.display = "none";
+  }
+
+  function resetSearch() {
+    hideAll();
+    if (activeMode === "crawler") {
+      document.getElementById("heroSearch").style.display = "block";
+      document.getElementById("searchInput").value = "";
+      document.getElementById("searchInput").focus();
+    } else {
+      document.getElementById("heroSummarize").style.display = "block";
+      document.getElementById("urlInput").value = "";
+      document.getElementById("urlInput").focus();
+    }
+  }
+
+  // ── Keyboard shortcuts ────────────────────
   document.getElementById("searchInput").addEventListener("keydown", e => {
     if (e.key === "Enter") searchNews();
   });
 
+  document.getElementById("urlInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") summarizeArticle();
+  });
+
   function quickSearch(term) {
-  document.getElementById("searchInput").value = term;
-  searchNews();
-}
+    document.getElementById("searchInput").value = term;
+    searchNews();
+  }
 </script>
 </body>
 </html>
