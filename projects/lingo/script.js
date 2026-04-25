@@ -1,9 +1,8 @@
 const GROQ_MODELS = [
   'llama-3.3-70b-versatile',
   'llama-3.1-8b-instant',
-  'openai/gpt-oss-120b',
-  'openai/gpt-oss-20b',
-  'qwen/qwen3-32b',
+  'gemma2-9b-it',
+  'qwen-qwq-32b',
 ];
 const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
 
@@ -575,10 +574,19 @@ QUIZ_JSON:{"questions":[{"q":"Fill in: She ___ a doctor.","options":["is","are",
   }
 }
 
+// Convert any leftover markdown to HTML before rendering
+function mdToHtml(text) {
+  return text
+    .replace(/^#{1,3}\s+(.+)$/gm, '<h4>$1</h4>')          // ### headings
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')       // **bold**
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')                   // *italic*
+    .replace(/`([^`]+)`/g, '<code>$1</code>');              // `code`
+}
+
 function renderLesson({ html, quiz }) {
   document.getElementById('lessonLoader').style.display = 'none';
   const content = document.getElementById('lessonContent');
-  content.innerHTML = html;
+  content.innerHTML = mdToHtml(html);
   content.classList.remove('hidden');
 
   if (quiz?.questions?.length) {
@@ -589,28 +597,38 @@ function renderLesson({ html, quiz }) {
 function renderQuiz(quiz) {
   const quizEl = document.getElementById('lessonQuiz');
   const container = document.getElementById('quizQuestions');
+
   container.innerHTML = quiz.questions.map((q, qi) =>
     `<div class="quiz-q" data-qi="${qi}" data-answer="${q.answer}">
       <p><strong>Q${qi + 1}.</strong> ${q.q}</p>
       <div class="quiz-options">
         ${q.options.map((opt, oi) =>
-          `<button class="quiz-option" data-oi="${oi}">${opt}</button>`
+          `<button class="quiz-option" data-oi="${oi}" type="button">${opt}</button>`
         ).join('')}
       </div>
     </div>`
   ).join('');
+
   quizEl.classList.remove('hidden');
   document.getElementById('quizResult').classList.add('hidden');
 
-  container.querySelectorAll('.quiz-option').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const qDiv = btn.closest('.quiz-q');
-      if (qDiv.dataset.answered) return;
-      qDiv.dataset.answered = '1';
-      qDiv.dataset.selected = btn.dataset.oi;
-      qDiv.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
+  // Event delegation — one listener on the container, never misses dynamically created buttons
+  container.addEventListener('click', (e) => {
+    const btn = e.target.closest('.quiz-option');
+    if (!btn) return;
+    const qDiv = btn.closest('.quiz-q');
+    if (qDiv.dataset.answered) return;
+    qDiv.dataset.answered = '1';
+    qDiv.dataset.selected = btn.dataset.oi;
+    // Visual feedback: highlight selected option immediately
+    qDiv.querySelectorAll('.quiz-option').forEach(b => {
+      b.disabled = true;
+      b.style.opacity = b === btn ? '1' : '0.5';
     });
-  });
+    btn.style.opacity = '1';
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = 'var(--accent)';
+  }, { once: false });
 }
 
 document.getElementById('checkQuizBtn').addEventListener('click', () => {
