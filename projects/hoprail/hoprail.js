@@ -398,60 +398,48 @@ function shake(inputId) {
 
 // ── Groq API ──────────────────────────────────────────────────────────────────
 async function callGroq(from, to, apiKey) {
-  const systemPrompt = `You are HopRail, an expert on Indian Railways. You have deep knowledge of train routes, junction stations, and connectivity across India. Always respond with valid JSON only — no markdown, no code fences, no explanation.`;
+  const systemPrompt = `You are HopRail, an Indian Railways expert. Respond with valid JSON only — no markdown, no prose.`;
 
-  const userPrompt = `Plan a journey from "${from}" to "${to}" on Indian Railways.
+  const userPrompt = `Journey: "${from}" → "${to}" on Indian Railways.
 
-Analyse:
-1. Direct train connectivity (how many trains run, how often)
-2. If direct connectivity is poor (fewer than 3 trains per week), identify 2–3 optimal hop routes via major railway junctions
-3. For each leg of each route, list real well-known train names
-
-Return this exact JSON (no markdown, just raw JSON):
+Return JSON:
 {
-  "sourceStation": "full station name as known on Indian Railways",
-  "destinationStation": "full station name as known on Indian Railways",
+  "sourceStation": "station name",
+  "destinationStation": "station name",
   "directTrains": {
-    "frequency": "none|rare|weekly|few_weekly|daily|multiple_daily",
+    "frequency": "none|rare|few_weekly|daily|multiple_daily",
     "count": 0,
-    "trains": [
-      {"name": "Train Name", "number": "12345", "daysPerWeek": 1, "approxDuration": "~18 hrs"}
-    ],
-    "note": "brief note about direct connectivity"
+    "trains": [{"name": "Train Name", "number": "12345", "daysPerWeek": 1, "approxDuration": "~18 hrs"}],
+    "note": "one line about direct connectivity"
   },
   "recommendation": "direct|hop",
   "hopRoutes": [
     {
       "id": 1,
-      "label": "Via [Junction Name]",
+      "label": "Via Junction Name",
       "reliability": "high|medium|low",
       "estimatedTotalTime": "24–28 hrs",
       "legs": [
         {
-          "from": "Station Name",
-          "to": "Station Name",
-          "keyTrains": ["Train Name 1", "Train Name 2", "Train Name 3"],
-          "frequency": "Multiple daily",
-          "approxDuration": "2–3 hrs",
-          "distance": "~150 km",
+          "from": "Station",
+          "to": "Station",
+          "keyTrains": ["Train 1", "Train 2"],
+          "frequency": "Daily",
+          "approxDuration": "~5 hrs",
+          "distance": "~300 km",
           "waitRisk": "low|medium|high",
           "notes": ""
         }
       ],
-      "pros": ["Pro point 1", "Pro point 2"],
-      "cons": ["Con point"],
-      "tip": "Practical booking or travel tip"
+      "pros": ["point"],
+      "cons": ["point"],
+      "tip": "booking tip"
     }
   ],
-  "insight": "2–3 sentence insight about travelling between these two cities on Indian Railways."
+  "insight": "2 sentences about this journey."
 }
 
-Rules:
-- If recommendation is "direct", hopRoutes can be empty or contain 1 alternative for reference
-- Always include 2–3 hopRoutes when recommendation is "hop"
-- Use actual train names you know (e.g. Chhattisgarh Express, Gondwana Express, Rajdhani)
-- waitRisk: low = daily multiple trains, medium = once daily, high = few per week
-- Be honest about uncertainty — if unsure of exact count, give best estimate`;
+Rules: Give 2–3 hopRoutes when recommendation is hop. Use real train names. waitRisk low=multiple daily, medium=once daily, high=few per week.`;
 
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
@@ -460,9 +448,9 @@ Rules:
       "Authorization": `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "llama-3.1-8b-instant",
+      model: "llama-3.3-70b-versatile",
       temperature: 0,
-      max_tokens: 2000,
+      max_tokens: 1500,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: systemPrompt },
