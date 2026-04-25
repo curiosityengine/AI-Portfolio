@@ -85,6 +85,13 @@ document.getElementById('openSettings').addEventListener('click', () => {
 document.getElementById('closeSettings').addEventListener('click', () => {
   document.getElementById('settingsModal').classList.add('hidden');
 });
+
+// Click outside modal box to close
+document.getElementById('settingsModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('settingsModal')) {
+    document.getElementById('settingsModal').classList.add('hidden');
+  }
+});
 document.getElementById('saveSettings').addEventListener('click', () => {
   const key = document.getElementById('settingsApiKey').value.trim();
   const name = document.getElementById('settingsName').value.trim();
