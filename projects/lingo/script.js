@@ -1,9 +1,8 @@
 const GROQ_MODELS = [
   'llama-3.3-70b-versatile',
-  'openai/gpt-oss-120b',
   'llama-3.1-8b-instant',
-  'openai/gpt-oss-20b',
-  'qwen/qwen3-32b',
+  'gemma2-9b-it',
+  'qwen-qwq-32b',
 ];
 const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
 
@@ -272,11 +271,32 @@ function renderSavedWords() {
 // ── Text to Speech ─────────────────────────────────────
 function speak(text, lang = 'en-US') {
   if (!('speechSynthesis' in window)) return;
+
+  // Chrome bug: speechSynthesis can get stuck in paused state — resume first
   window.speechSynthesis.cancel();
-  const utt = new SpeechSynthesisUtterance(text);
-  utt.lang = lang;
-  utt.rate = 0.9;
-  window.speechSynthesis.speak(utt);
+
+  const doSpeak = () => {
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = lang;
+    utt.rate = 0.85;
+
+    // Pick the best available English voice
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(v => v.lang === lang && v.localService)
+      || voices.find(v => v.lang.startsWith('en'))
+      || voices[0];
+    if (preferred) utt.voice = preferred;
+
+    window.speechSynthesis.speak(utt);
+  };
+
+  // Voices may not be ready yet (Chrome async load)
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length) {
+    doSpeak();
+  } else {
+    window.speechSynthesis.addEventListener('voiceschanged', doSpeak, { once: true });
+  }
 }
 
 // ── Chat ───────────────────────────────────────────────
