@@ -460,7 +460,7 @@ Rules:
       "Authorization": `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "qwen/qwen3-32b",
+      model: "llama-3.3-70b-versatile",
       temperature: 0,
       max_tokens: 2000,
       messages: [
