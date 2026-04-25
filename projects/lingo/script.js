@@ -1,18 +1,23 @@
 const GROQ_MODELS = [
   'llama-3.3-70b-versatile',
-  'llama-3.1-70b-versatile'
+  'llama-3.1-70b-versatile',
   'llama-3.1-8b-instant',
-  'gemma2-9b-it'
+  'gemma2-9b-it',
   'qwen-qwq-32b',
 ];
 const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
 
 // ── State ──────────────────────────────────────────────
+function safeParse(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+  catch { return fallback; }
+}
+
 const state = {
   apiKey: localStorage.getItem('lingo_api_key') || '',
   userName: localStorage.getItem('lingo_name') || '',
-  savedWords: JSON.parse(localStorage.getItem('lingo_saved_words') || '[]'),
-  stats: JSON.parse(localStorage.getItem('lingo_stats') || '{"words":0,"messages":0,"grammar":0,"streak":0,"lastDate":""}'),
+  savedWords: safeParse('lingo_saved_words', []),
+  stats: safeParse('lingo_stats', { words: 0, messages: 0, grammar: 0, streak: 0, lastDate: '' }),
   chatMode: 'beginner',
   chatHistory: [],
   currentWord: null,
@@ -59,11 +64,11 @@ const apiKeyInput = document.getElementById('apiKeyInput');
 
 document.getElementById('saveApiKey').addEventListener('click', () => {
   const key = apiKeyInput.value.trim();
-  if (!key.startsWith('gsk_')) return alert('Valid Groq key gsk_ से शुरू होती है।');
+  if (!key || key.length < 10) return alert('कृपया valid Groq API key डालें।');
   state.apiKey = key;
   localStorage.setItem('lingo_api_key', key);
   apiModal.classList.add('hidden');
-  initApp();
+  try { initApp(); } catch (e) { console.error('initApp error:', e); }
 });
 
 apiKeyInput.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('saveApiKey').click(); });
