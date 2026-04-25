@@ -462,7 +462,8 @@ Rules:
     body: JSON.stringify({
       model: "llama-3.3-70b-versatile",
       temperature: 0,
-      max_tokens: 2000,
+      max_tokens: 4000,
+      response_format: { type: "json_object" },
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user",   content: userPrompt },
@@ -484,20 +485,22 @@ Rules:
 }
 
 function parseGroqResponse(raw) {
-  // Strip markdown fences if present
   let text = raw.trim();
-  text = text.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/i, "");
 
-  try {
-    return JSON.parse(text);
-  } catch {
-    // Try to find JSON object in the response
-    const match = text.match(/\{[\s\S]*\}/);
-    if (match) {
-      try { return JSON.parse(match[0]); } catch {}
-    }
-    throw new Error("Could not parse AI response. Please try again.");
+  // Try direct parse first (response_format: json_object should give clean JSON)
+  try { return JSON.parse(text); } catch {}
+
+  // Strip any markdown fences
+  text = text.replace(/^```(?:json)?\s*/im, "").replace(/\s*```\s*$/im, "").trim();
+  try { return JSON.parse(text); } catch {}
+
+  // Last resort: extract the outermost JSON object
+  const match = text.match(/\{[\s\S]*\}/);
+  if (match) {
+    try { return JSON.parse(match[0]); } catch {}
   }
+
+  throw new Error("Could not parse AI response. Please try again.");
 }
 
 // ── Loader ────────────────────────────────────────────────────────────────────
