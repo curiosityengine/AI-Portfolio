@@ -435,3 +435,8 @@ a { text-decoration: none; color: inherit; }
 @media (max-width: 600px) {
   .sm-love-dislike-grid { grid-template-columns: 1fr; }
 }
+.sm-toggle-btn.active {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
