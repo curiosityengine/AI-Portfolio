@@ -531,53 +531,76 @@ async function loadGrammarLesson(topic) {
   document.getElementById('lessonContent').classList.add('hidden');
   document.getElementById('lessonQuiz').classList.add('hidden');
 
-  if (lessonCache[topic]) {
-    renderLesson(lessonCache[topic]);
-    return;
-  }
-
   try {
-    const raw = await groqChat([
-      {
-        role: 'system',
-        content: `You are an English grammar teacher for Hindi-speaking students. Explain clearly using Hindi examples. Use HTML formatting with <h4>, <p>, <ul>, <li>, <div class="rule-box">, <div class="example">, <code>, <table>, <th>, <td> tags. Keep it practical and easy to understand.`,
-      },
-      {
-        role: 'user',
-        content: `Create a complete Hindi-medium lesson on English grammar topic: "${topicLabels[topic]}".
+    // Fetch lesson HTML (cached) and fresh quiz questions (always new) in parallel
+    const [html, quiz] = await Promise.all([
+      lessonCache[topic]
+        ? Promise.resolve(lessonCache[topic])
+        : fetchLessonHtml(topic),
+      fetchQuiz(topic),
+    ]);
 
+    if (!lessonCache[topic]) {
+      lessonCache[topic] = html;
+      state.stats.grammar += 1;
+      checkStreak();
+      saveState();
+      updateStats();
+    }
+
+    renderLesson({ html, quiz });
+  } catch (e) {
+    document.getElementById('lessonLoader').style.display = 'none';
+    document.getElementById('lessonContent').classList.remove('hidden');
+    document.getElementById('lessonContent').innerHTML = `<p style="color:var(--red)">Error: ${e.message}</p>`;
+  }
+}
+
+async function fetchLessonHtml(topic) {
+  const raw = await groqChat([
+    {
+      role: 'system',
+      content: `You are an English grammar teacher for Hindi-speaking students. Explain clearly using Hindi examples. Use HTML formatting with <h4>, <p>, <ul>, <li>, <div class="rule-box">, <div class="example">, <code>, <table>, <th>, <td> tags. Keep it practical and easy to understand. Return ONLY the HTML content, no markdown.`,
+    },
+    {
+      role: 'user',
+      content: `Create a complete Hindi-medium lesson on English grammar topic: "${topicLabels[topic]}".
 Include:
 1. Simple explanation in Hindi (what it is and why it matters)
 2. The main rules with HTML formatting
 3. 4-5 example sentences with Hindi translations (use div class="example")
 4. Common mistakes Hindi speakers make
-5. Quick memory trick (याद रखने का तरीका)
+5. Quick memory trick (याद रखने का तरीका)`,
+    },
+  ]);
+  return raw;
+}
 
-After the lesson HTML, add a JSON block like this (OUTSIDE the HTML):
-QUIZ_JSON:{"questions":[{"q":"Fill in: She ___ a doctor.","options":["is","are","am","be"],"answer":0},{"q":"Which is correct?","options":["I am going","I is going","I are going","I be going"],"answer":0},{"q":"Choose correct sentence:","options":["He have a car","He has a car","He having a car","He had have a car"],"answer":1}]}`,
-      },
-    ]);
+async function fetchQuiz(topic) {
+  const raw = await groqChat([
+    {
+      role: 'system',
+      content: `You are an English grammar quiz generator. Return ONLY a valid JSON object, no extra text.`,
+    },
+    {
+      role: 'user',
+      content: `Generate 5 unique multiple-choice quiz questions about "${topicLabels[topic]}" for Hindi-speaking English learners.
 
-    const quizMatch = raw.match(/QUIZ_JSON:(\{[\s\S]*\})/);
-    let quiz = null;
-    let html = raw;
-    if (quizMatch) {
-      try { quiz = JSON.parse(quizMatch[1]); } catch (_) {}
-      html = raw.replace(/QUIZ_JSON:[\s\S]*$/, '').trim();
-    }
+Rules:
+- Questions must be DIFFERENT every time — vary sentence structures, vocabulary, and grammar points tested
+- Each question has exactly 4 options
+- "answer" is the 0-based index of the correct option
+- Mix fill-in-the-blank, error correction, and choose-the-correct-sentence styles
 
-    const lesson = { html, quiz };
-    lessonCache[topic] = lesson;
-    renderLesson(lesson);
+Return JSON:
+{"questions":[{"q":"question text","options":["a","b","c","d"],"answer":0}, ...5 items]}`,
+    },
+  ], { json: true });
 
-    state.stats.grammar += 1;
-    checkStreak();
-    saveState();
-    updateStats();
-  } catch (e) {
-    document.getElementById('lessonLoader').style.display = 'none';
-    document.getElementById('lessonContent').classList.remove('hidden');
-    document.getElementById('lessonContent').innerHTML = `<p style="color:var(--red)">Error: ${e.message}</p>`;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
   }
 }
 
