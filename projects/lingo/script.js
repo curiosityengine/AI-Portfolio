@@ -1,4 +1,10 @@
-const GROQ_MODELS = ['llama-3.3-70b-versatile', 'llama3-70b-8192'];
+const GROQ_MODELS = [
+  'llama-3.3-70b-versatile',
+  'llama3-70b-8192',
+  'llama-3.1-8b-instant',
+  'llama3-8b-8192',
+  'gemma2-9b-it',
+];
 const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
 
 // ── State ──────────────────────────────────────────────
@@ -19,26 +25,32 @@ function saveState() {
 
 // ── Groq API ───────────────────────────────────────────
 async function groqChat(messages, { json = false } = {}) {
-  const body = {
-    model: GROQ_MODELS[0],
-    messages,
-    temperature: 0.7,
-    max_tokens: 1500,
-  };
-  if (json) body.response_format = { type: 'json_object' };
+  let lastError;
+  for (const model of GROQ_MODELS) {
+    const body = { model, messages, temperature: 0.7, max_tokens: 1500 };
+    if (json) body.response_format = { type: 'json_object' };
 
-  let res = await fetch(GROQ_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${state.apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
+    const res = await fetch(GROQ_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${state.apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
 
-  if (!res.ok) {
+    if (res.ok) {
+      const data = await res.json();
+      return data.choices[0].message.content;
+    }
+
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error?.message || `API error ${res.status}`);
+    const msg = err?.error?.message || `API error ${res.status}`;
+    const isRateLimit = res.status === 429 || msg.toLowerCase().includes('rate limit');
+    if (isRateLimit) {
+      lastError = `Rate limit on ${model}, trying next model...`;
+      continue;
+    }
+    throw new Error(msg);
   }
-  const data = await res.json();
-  return data.choices[0].message.content;
+  throw new Error('सभी models का rate limit हो गया है। कुछ देर बाद try करें। ' + (lastError || ''));
 }
 
 // ── API Key Modal ──────────────────────────────────────
