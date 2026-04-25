@@ -75,23 +75,33 @@ document.getElementById('saveApiKey').addEventListener('click', () => {
 apiKeyInput.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('saveApiKey').click(); });
 
 // ── Settings Modal ─────────────────────────────────────
-document.getElementById('openSettings').addEventListener('click', () => {
+const settingsModal = document.getElementById('settingsModal');
+
+function openSettings() {
   document.getElementById('settingsApiKey').value = state.apiKey;
   document.getElementById('settingsName').value = state.userName;
   document.getElementById('settingsVoiceRssKey').value = state.voiceRssKey;
   document.getElementById('settingsVoice').value = state.ttsVoice;
-  document.getElementById('settingsModal').classList.remove('hidden');
-});
-document.getElementById('closeSettings').addEventListener('click', () => {
-  document.getElementById('settingsModal').classList.add('hidden');
-});
+  settingsModal.style.display = 'flex';
+}
+
+function closeSettingsModal() {
+  settingsModal.style.display = 'none';
+}
+
+document.getElementById('openSettings').addEventListener('click', openSettings);
+document.getElementById('closeSettings').addEventListener('click', closeSettingsModal);
 
 // Click outside modal box to close
-document.getElementById('settingsModal').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('settingsModal')) {
-    document.getElementById('settingsModal').classList.add('hidden');
-  }
+settingsModal.addEventListener('click', (e) => {
+  if (e.target === settingsModal) closeSettingsModal();
 });
+
+// Escape key to close
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeSettingsModal();
+});
+
 document.getElementById('saveSettings').addEventListener('click', () => {
   const key = document.getElementById('settingsApiKey').value.trim();
   const name = document.getElementById('settingsName').value.trim();
@@ -103,7 +113,7 @@ document.getElementById('saveSettings').addEventListener('click', () => {
   if (voiceRssKey) { state.voiceRssKey = voiceRssKey; localStorage.setItem('lingo_voicerss_key', voiceRssKey); }
   state.ttsVoice = voice;
   localStorage.setItem('lingo_tts_voice', voice);
-  document.getElementById('settingsModal').classList.add('hidden');
+  closeSettingsModal();
   updateGreeting();
 });
 
