@@ -181,10 +181,11 @@ const STATIONS = [
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let fromStation = null;
-let toStation   = null;
-let loaderTimer = null;
-let loaderStep  = 0;
+let fromStation  = null;
+let toStation    = null;
+let loaderTimer  = null;
+let loaderStep   = 0;
+let verifiedByApi = false; // true when RapidAPI was used for direct train data
 
 const LOADER_STEPS = [
   "Checking direct train connections…",
@@ -336,26 +337,70 @@ function setExample(fromName, toName) {
   document.getElementById("toInput").closest(".hr-input-row").classList.add("has-value");
 }
 
-// ── API Key ───────────────────────────────────────────────────────────────────
-function getApiKey() { return localStorage.getItem("hoprail_groq_key") || ""; }
+// ── API Keys ──────────────────────────────────────────────────────────────────
+function getApiKey()      { return localStorage.getItem("hoprail_groq_key")   || ""; }
+function getRapidApiKey() { return localStorage.getItem("hoprail_rapid_key")  || ""; }
 
 function saveApiKey() {
-  const val = document.getElementById("keyInput").value.trim();
-  if (!val) return;
-  localStorage.setItem("hoprail_groq_key", val);
+  const groq  = document.getElementById("keyInput").value.trim();
+  const rapid = document.getElementById("rapidKeyInput").value.trim();
+  if (groq)  localStorage.setItem("hoprail_groq_key",  groq);
+  if (rapid) localStorage.setItem("hoprail_rapid_key", rapid);
+  if (!groq && !rapid) return;
   closeKeyModal();
   updateKeyDot();
 }
 
-function openKeyModal()  { document.getElementById("keyModal").classList.add("open"); document.getElementById("keyInput").value = getApiKey(); document.getElementById("keyInput").focus(); }
+function openKeyModal() {
+  document.getElementById("keyModal").classList.add("open");
+  document.getElementById("keyInput").value      = getApiKey();
+  document.getElementById("rapidKeyInput").value = getRapidApiKey();
+  document.getElementById("keyInput").focus();
+}
 function closeKeyModal() { document.getElementById("keyModal").classList.remove("open"); }
 
 function updateKeyDot() {
-  const dot = document.getElementById("keyDot");
-  dot.classList.toggle("set", !!getApiKey());
+  const dot      = document.getElementById("keyDot");
+  const hasGroq  = !!getApiKey();
+  const hasRapid = !!getRapidApiKey();
+  dot.classList.toggle("set",  hasGroq && !hasRapid);
+  dot.classList.toggle("full", hasGroq &&  hasRapid);
 }
 
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeKeyModal(); });
+
+// ── RapidAPI — Fetch Real Direct Trains ───────────────────────────────────────
+async function fetchDirectTrains(fromCode, toCode, rapidKey) {
+  const today = new Date();
+  const dd    = String(today.getDate()).padStart(2, "0");
+  const mm    = String(today.getMonth() + 1).padStart(2, "0");
+  const yyyy  = today.getFullYear();
+  const date  = `${dd}-${mm}-${yyyy}`;
+
+  const url = `https://irctc1.p.rapidapi.com/api/v3/trainBetweenStations` +
+              `?fromStationCode=${encodeURIComponent(fromCode)}` +
+              `&toStationCode=${encodeURIComponent(toCode)}` +
+              `&dateOfJourney=${date}`;
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      "X-RapidAPI-Key":  rapidKey,
+      "X-RapidAPI-Host": "irctc1.p.rapidapi.com",
+    },
+  });
+
+  if (res.status === 403 || res.status === 401)
+    throw new Error("Invalid RapidAPI key. Please check your key in settings.");
+  if (res.status === 429)
+    throw new Error("RapidAPI rate limit hit. Please wait a moment.");
+  if (!res.ok)
+    throw new Error(`RapidAPI error ${res.status}`);
+
+  const json = await res.json();
+  // irctc1 returns { status: true, data: [...] }
+  return Array.isArray(json.data) ? json.data : [];
+}
 
 // ── Main Search ───────────────────────────────────────────────────────────────
 async function findRoutes() {
@@ -368,18 +413,33 @@ async function findRoutes() {
   const fromName = fromStation?.name || fromVal;
   const toName   = toStation?.name   || toVal;
 
-  if (fromName.toLowerCase() === toName.toLowerCase()) {
-    shake("toInput"); return;
-  }
+  if (fromName.toLowerCase() === toName.toLowerCase()) { shake("toInput"); return; }
 
-  const apiKey = getApiKey();
-  if (!apiKey) { openKeyModal(); return; }
+  const groqKey = getApiKey();
+  if (!groqKey) { openKeyModal(); return; }
 
   showLoader();
   hideAll();
 
   try {
-    const data = await callGroq(fromName, toName, apiKey);
+    // Step 1: Fetch real direct train data from RapidAPI (if key is set)
+    let realTrains = null;
+    const rapidKey = getRapidApiKey();
+
+    if (rapidKey && fromStation?.code && toStation?.code) {
+      setLoaderText("Fetching live train data from Indian Railways…", 10);
+      try {
+        realTrains = await fetchDirectTrains(fromStation.code, toStation.code, rapidKey);
+      } catch (e) {
+        // Non-fatal — fall back to pure LLM if RapidAPI fails
+        console.warn("RapidAPI fetch failed, using LLM only:", e.message);
+      }
+    }
+
+    // Step 2: Call Groq with real data injected as context
+    setLoaderText("Planning hop routes with AI…", 40);
+    verifiedByApi = realTrains !== null;
+    const data = await callGroq(fromName, toName, groqKey, realTrains);
     hideLoader();
     renderResults(data, fromName, toName);
   } catch (err) {
@@ -397,11 +457,26 @@ function shake(inputId) {
 }
 
 // ── Groq API ──────────────────────────────────────────────────────────────────
-async function callGroq(from, to, apiKey) {
+async function callGroq(from, to, apiKey, realTrains = null) {
+  // Build verified data block from RapidAPI results
+  let verifiedBlock = "";
+  if (realTrains !== null) {
+    if (realTrains.length === 0) {
+      verifiedBlock = `\n⚠ VERIFIED BY IRCTC API: No direct trains found between these stations on today's date. Use frequency "none" and recommendation "hop".\n`;
+    } else {
+      const lines = realTrains.slice(0, 8).map(t => {
+        const days = Array.isArray(t.run_days) ? t.run_days.join(", ") : (t.run_days || "N/A");
+        const dur  = t.duration || t.travel_time || "?";
+        return `  • ${t.train_name} (${t.train_number}) — runs: ${days} — duration: ~${dur}`;
+      }).join("\n");
+      verifiedBlock = `\n✅ VERIFIED BY IRCTC API — use this data exactly for directTrains, do NOT contradict it:\n${lines}\n`;
+    }
+  }
+
   const systemPrompt = `You are HopRail, an Indian Railways expert. Respond with valid JSON only — no markdown, no prose.`;
 
   const userPrompt = `Journey: "${from}" → "${to}" on Indian Railways.
-
+${verifiedBlock}
 Return JSON:
 {
   "sourceStation": "station name",
@@ -439,7 +514,11 @@ Return JSON:
   "insight": "2 sentences about this journey."
 }
 
-Rules: Give 2–3 hopRoutes when recommendation is hop. Use real train names. waitRisk low=multiple daily, medium=once daily, high=few per week.`;
+Rules:
+- If VERIFIED DATA is provided above, copy it exactly into directTrains — do not guess or override it.
+- If no verified data, use "rare" instead of "none" when uncertain (especially for Northeast India routes).
+- Give 2–3 hopRoutes when recommendation is hop. Use your knowledge of Indian Railways junctions for routing.
+- waitRisk: low=multiple daily, medium=once daily, high=few per week.`;
 
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
@@ -506,6 +585,11 @@ function updateLoaderStep() {
   document.getElementById("loaderStepText").textContent = LOADER_STEPS[loaderStep];
   const pct = Math.round(((loaderStep + 1) / LOADER_STEPS.length) * 85);
   document.getElementById("loaderBar").style.width = pct + "%";
+}
+
+function setLoaderText(text, pct) {
+  document.getElementById("loaderStepText").textContent = text;
+  if (pct !== undefined) document.getElementById("loaderBar").style.width = pct + "%";
 }
 
 function hideLoader() {
@@ -583,8 +667,10 @@ function renderDirectSection(directTrains, isDirect) {
   } else {
     cls   = "none";
     icon  = "✕";
-    title = "No direct trains found";
-    sub   = note || "Hop route is the only option";
+    title = verifiedByApi ? "No direct trains found" : "No direct trains found by AI";
+    sub   = note || (verifiedByApi
+      ? "Confirmed by Indian Railways data — a hop route is your best option"
+      : "AI estimate — verify on IRCTC before assuming none exist");
   }
 
   const trainsHtml = trains.length ? `
@@ -719,6 +805,7 @@ function reliabilityLabel(r) {
 
 // ── Reset ─────────────────────────────────────────────────────────────────────
 function resetSearch() {
+  verifiedByApi = false;
   hideAll();
   document.getElementById("hero").style.display = "block";
   document.getElementById("fromInput").focus();
