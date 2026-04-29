@@ -819,12 +819,31 @@ const FALLBACK_DB = {
     "Howrah–Pune is a long cross-India journey via Nagpur. Azad Hind Express runs daily; a great overnight-plus option through central India."
   ),
 
-  // Raipur→Gaya: only 1 direct train — 22358 Mumbai LTT SF Express (few weekly)
-  "R-GAYA": _dr("few_weekly", 1,
-    [_t("22358","Mumbai LTT SF Express",3,"~18 hrs")],
-    "Only 1 direct train (22358, runs ~3 days/week); hop route recommended for flexibility",
-    [],
-    "Raipur–Gaya has just one direct train, the Mumbai LTT SF Express 22358, which runs a few days a week. Book early or consider hopping via Bilaspur for more frequent options."
+  // Raipur→Gaya: only 1 direct train — 22358 Mumbai LTT SF Express (weekly, 1 day)
+  "R-GAYA": _dr("rare", 1,
+    [_t("22358","Mumbai LTT SF Express",1,"~18 hrs")],
+    "Only 1 direct train (22358), runs just 1 day/week — hop route recommended for flexibility",
+    [
+      _h("Via Bilaspur Junction", "high", "20–24 hrs",
+        [
+          _l("Raipur Junction", "Bilaspur Junction", ["Chhattisgarh Express 18237", "Intercity Express"], "Multiple daily", "~2 hrs", "~120 km", "low", "Very frequent — easy to catch"),
+          _l("Bilaspur Junction", "Gaya Junction", ["Narmada Express 18234", "Bilaspur–Patna Express"], "Daily", "~18 hrs", "~800 km", "low", "Bilaspur–Patna trains stop at Gaya"),
+        ],
+        ["Bilaspur has very frequent trains to Raipur", "Daily onward trains to Gaya from Bilaspur"],
+        ["~20 hrs total journey with one change", "Allow 2–4 hrs wait at Bilaspur"],
+        "Book the Raipur→Bilaspur leg first (many options), then Narmada Express to Gaya. Both segments easy to get on short notice."
+      ),
+      _h("Via Ranchi Junction", "medium", "24–30 hrs",
+        [
+          _l("Raipur Junction", "Ranchi Junction", ["Jharkhand Express 18609", "Ranchi Express"], "Few weekly", "~10 hrs", "~420 km", "medium", "Check running days before booking"),
+          _l("Ranchi Junction", "Gaya Junction", ["Patna Express 12817", "South Bihar Express 13288"], "Daily", "~5 hrs", "~250 km", "low", "Multiple daily trains from Ranchi to Gaya"),
+        ],
+        ["Shorter second leg from Ranchi to Gaya"],
+        ["Fewer Raipur→Ranchi trains; check schedule carefully", "Longer total journey"],
+        "Only consider this if the Bilaspur route doesn't have convenient timing. Verify Raipur→Ranchi running days on IRCTC.", 2
+      ),
+    ],
+    "Raipur–Gaya has just one direct train (22358, weekly). For most days, the hop via Bilaspur is the practical choice — frequent first leg, daily onward trains."
   ),
 
   "BPL-HWH": _dr("few_weekly", 2,
