@@ -908,19 +908,19 @@ const FALLBACK_DB = {
     "Dimapur–Delhi requires a change at Guwahati. The first leg (Dimapur→Guwahati) is short at ~4 hrs. Total journey 38–44 hrs."
   ),
 
-  "SCL-NDLS": _hr("none", 0, [], "No direct train from Silchar to Delhi",
+  "SCL-NDLS": _hr("rare", 1, [_t("14037","Poorvottar Sampark Kranti Exp",1,"~41 hrs")], "1 weekly direct train; hop via Guwahati is more flexible",
     [
-      _h("Via Guwahati Junction", "high", "40–48 hrs",
+      _h("Via Guwahati Junction", "high", "36–44 hrs",
         [
-          _l("Silchar Junction", "Guwahati Junction", ["Barak Valley Express 15606", "Silchar–Guwahati Exp."], "Daily", "~10 hrs", "~450 km", "low", "Barak Valley Express runs daily"),
-          _l("Guwahati Junction", "New Delhi Junction", ["NE Rajdhani 12423", "Brahmaputra Mail 14056"], "Daily", "~17 hrs", "~1800 km", "low", "NE Rajdhani is fastest to Delhi"),
+          _l("Silchar Junction", "Guwahati Junction", ["Barak Valley Express 15606", "Cachar Express"], "Daily", "~8 hrs", "~380 km", "low", "Multiple trains daily from Silchar to Guwahati"),
+          _l("Guwahati Junction", "New Delhi Junction", ["NE Rajdhani 12423", "Brahmaputra Mail 14056"], "Daily", "~17 hrs", "~1800 km", "medium", "NE Rajdhani is fastest to Delhi"),
         ],
-        ["Barak Valley Express is comfortable for the first leg", "Guwahati hub gives daily options to Delhi"],
-        ["40+ hours total journey", "Long wait possible at Guwahati — plan accordingly"],
-        "Barak Valley Express to Guwahati, then NE Rajdhani to Delhi is the smoothest combination. Alternatively, break journey overnight at Guwahati."
+        ["Daily frequency via Guwahati vs weekly direct", "Rajdhani on 2nd leg saves time"],
+        ["Two-leg journey with waiting time at Guwahati", "Total 40+ hrs travel"],
+        "Unless your travel day is Monday (direct 14037 runs), hopping via Guwahati gives far more flexibility."
       ),
     ],
-    "Silchar (Barak Valley)–Delhi has no direct train. Route via Guwahati is the only practical option. Total journey 40–48 hrs with one change."
+    "1 direct train (14037 Poorvottar Sampark Kranti, Mon only, ~41 hrs). Daily hop via Guwahati is more practical for most travel days."
   ),
 
   "DBRG-NDLS": _hr("rare", 1, [_t("15959","Kamrup Express",3,"~48 hrs")], "1 rare direct train; practical route is via Guwahati",
@@ -1412,7 +1412,9 @@ async function findRoutes() {
       showDayScan();
       try {
         realTrains = await fetchDirectTrains(fromCode, toCode, fromName, toName);
-        verifiedByApi = true;
+        // Only trust NTES if it actually returned data — empty array may mean scraping failed
+        verifiedByApi = Array.isArray(realTrains) && realTrains.length > 0;
+        if (!verifiedByApi) realTrains = null; // fall through to fallback/Groq
         updateDayPips(10);
       } catch (e) {
         if (e.message === "ntes_not_configured") {
