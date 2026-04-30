@@ -1302,7 +1302,7 @@ async function fetchDirectTrains(fromCode, toCode) {
   setLoaderText("Fetching live train data from NTES…", 15);
   updateDayPips(5); // show progress early
 
-  const url = `${workerUrl.replace(/\/$/, "")}?from=${encodeURIComponent(fromCode)}&to=${encodeURIComponent(toCode)}`;
+  const url = `${workerUrl.replace(/\/$/, "")}/api/hoprail/trains?from=${encodeURIComponent(fromCode)}&to=${encodeURIComponent(toCode)}`;
 
   const res = await fetch(url);
 
