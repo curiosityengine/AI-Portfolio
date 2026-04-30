@@ -165,7 +165,7 @@
         <span></span><span></span><span></span><span></span><span></span>
         <span></span><span></span><span></span><span></span><span></span>
       </div>
-      <div class="hr-day-text" id="dayScanText">Scanning 0 / 30 days…</div>
+      <div class="hr-day-text" id="dayScanText">Querying NTES…</div>
     </div>
 
     <!-- Step text -->
@@ -240,16 +240,16 @@
     </div>
 
     <p class="hr-modal-sub" style="margin-bottom:0.5rem">
-      <strong>RapidAPI Key</strong> (optional but recommended) — fetches real IRCTC train data
-      across all 30 days so bi-weekly and special trains are never missed. Get a free key at
-      <a href="https://rapidapi.com/IRCTC/api/irctc1" target="_blank" rel="noopener">rapidapi.com → IRCTC API</a>.
+      <strong>NTES Worker URL</strong> (optional but recommended) — fetches real Indian Railways
+      train data via your Cloudflare Worker proxy to NTES. A single call returns all trains on
+      the route with running-day info — no quota exhaustion.
     </p>
     <div class="hr-key-input-wrap" style="margin-bottom:1rem">
       <input
-        type="password"
-        id="rapidKeyInput"
+        type="text"
+        id="ntesWorkerInput"
         class="hr-key-input"
-        placeholder="RapidAPI key…"
+        placeholder="https://hoprail-ntes.your-name.workers.dev"
         autocomplete="off"
         spellcheck="false"
       >
