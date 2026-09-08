@@ -1536,7 +1536,7 @@ Rules:
       "Authorization": `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "llama-3.3-70b-versatile",
+      model: "meta-llama/llama-prompt-guard-2-22m",
       temperature: 0,
       max_tokens: 3500,
       response_format: { type: "json_object" },
