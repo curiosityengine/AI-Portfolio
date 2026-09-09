@@ -1538,7 +1538,7 @@ Rules:
     body: JSON.stringify({
       model: "meta-llama/llama-prompt-guard-2-22m",
       temperature: 0,
-      max_tokens: 3500,
+      max_tokens: 350,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: systemPrompt },
